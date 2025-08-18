@@ -39,33 +39,39 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     ]);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
+    $curlError = curl_error($ch);
     curl_close($ch);
-    
-    if ($error) {
-        echo json_encode(['error' => 'Erreur de connexion: ' . $error]);
+
+    if ($curlError) {
+        echo json_encode(['error' => 'Erreur de connexion: ' . $curlError]);
         exit;
     }
-    
-    $responseData = json_decode($response, true);
-    
-    if ($responseData) {
-        $assistantMessage = 
-            $responseData['textResponse'] ?? 
-            $responseData['response'] ?? 
-            $responseData['message'] ?? 
-            'Aucune réponse reçue';
-        
-        echo json_encode([
-            'success' => true,
-            'message' => $assistantMessage
-        ]);
-    } else {
-        echo json_encode(['error' => 'Format de réponse invalide']);
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        echo json_encode(['error' => 'Erreur HTTP: ' . $httpCode]);
+        exit;
     }
+
+    $responseData = json_decode($response, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo json_encode(['error' => 'Format de réponse invalide']);
+        exit;
+    }
+
+    $assistantMessage =
+        $responseData['textResponse'] ??
+        $responseData['response'] ??
+        $responseData['message'] ??
+        'Aucune réponse reçue';
+
+    echo json_encode([
+        'success' => true,
+        'message' => $assistantMessage
+    ]);
     exit;
 }
 ?>
