@@ -27,8 +27,8 @@ function askHelp(question) {
     console.log('askHelp appelé avec:', question);
     messageInput.value = question;
     toggleHelpPanel();
-    // Déclencher l'envoi du formulaire
-    sendMessage(question);
+    // Déclencher l'envoi du formulaire via l'événement de soumission
+    chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
 }
 
 function toggleThemeDropdown() {
