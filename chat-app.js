@@ -178,9 +178,12 @@ function scrollToBottom() {
     }, 100);
 }
 
-function addMessage(content, isUser = false, isError = false) {
+function addMessage(content, isUser = false, isError = false, id = null) {
     const wrapper = document.createElement('div');
     wrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
+    if (id) {
+        wrapper.dataset.id = id;
+    }
     
     const avatar = document.createElement('div');
     avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
@@ -194,8 +197,25 @@ function addMessage(content, isUser = false, isError = false) {
     message.textContent = content;
     
     messageContent.appendChild(message);
-    
-    if (!isUser && !isError) {
+
+    if (isUser) {
+        const actions = document.createElement('div');
+        actions.className = 'message-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'action-btn';
+        editBtn.textContent = 'Éditer';
+        editBtn.onclick = () => editUserMessage(wrapper, message);
+
+        const historyBtn = document.createElement('button');
+        historyBtn.className = 'action-btn';
+        historyBtn.textContent = 'Historique';
+        historyBtn.onclick = () => showHistory(wrapper, message);
+
+        actions.appendChild(editBtn);
+        actions.appendChild(historyBtn);
+        messageContent.appendChild(actions);
+    } else if (!isError) {
         const actions = document.createElement('div');
         actions.className = 'message-actions';
         
@@ -257,6 +277,59 @@ function addMessage(content, isUser = false, isError = false) {
     scrollToBottom();
 }
 
+async function editUserMessage(wrapper, messageEl) {
+    const current = messageEl.textContent;
+    const updated = prompt('Modifier le message :', current);
+    if (updated && updated !== current) {
+        messageEl.textContent = updated;
+        const formData = new FormData();
+        formData.append('action', 'edit');
+        formData.append('messageId', wrapper.dataset.id);
+        formData.append('newMessage', updated);
+        try {
+            await fetch('chatv2.php', { method: 'POST', body: formData });
+            showToast('Message modifié', 'success');
+        } catch (err) {
+            showToast('Erreur lors de la modification', 'error');
+        }
+    }
+}
+
+async function showHistory(wrapper, messageEl) {
+    const formData = new FormData();
+    formData.append('action', 'history');
+    formData.append('messageId', wrapper.dataset.id);
+    try {
+        const response = await fetch('chatv2.php', { method: 'POST', body: formData });
+        const data = await response.json();
+        if (!data.success || !data.revisions || data.revisions.length === 0) {
+            showToast('Aucune révision', 'error');
+            return;
+        }
+        const list = data.revisions
+            .map((rev, i) => `${i + 1}. ${rev}`)
+            .join('\n');
+        const choice = prompt(`Historique des révisions:\n${list}\nNuméro à restaurer :`);
+        const index = parseInt(choice) - 1;
+        if (!isNaN(index) && data.revisions[index]) {
+            const restoreData = new FormData();
+            restoreData.append('action', 'restore');
+            restoreData.append('messageId', wrapper.dataset.id);
+            restoreData.append('index', index);
+            const restoreResp = await fetch('chatv2.php', { method: 'POST', body: restoreData });
+            const restoreJson = await restoreResp.json();
+            if (restoreJson.success && restoreJson.message) {
+                messageEl.textContent = restoreJson.message;
+                showToast('Révision restaurée', 'success');
+            } else {
+                showToast('Échec de la restauration', 'error');
+            }
+        }
+    } catch (err) {
+        showToast('Erreur lors de la récupération', 'error');
+    }
+}
+
 function showTyping() {
     const wrapper = document.createElement('div');
     wrapper.className = 'message-wrapper';
@@ -284,8 +357,9 @@ function hideTyping() {
 
 async function sendMessage(message) {
     console.log('Envoi du message:', message);
-    
-    addMessage(message, true);
+
+    const messageId = `msg-${Date.now()}`;
+    addMessage(message, true, false, messageId);
     showTyping();
     
     messageInput.disabled = true;
@@ -297,6 +371,7 @@ async function sendMessage(message) {
         formData.append('action', 'chat');
         formData.append('message', message);
         formData.append('workspace', WORKSPACE);
+        formData.append('messageId', messageId);
         
         const response = await fetch('chatv2.php', {
             method: 'POST',
