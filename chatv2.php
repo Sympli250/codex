@@ -10,68 +10,127 @@ $CURRENT_USER = 'Sympli250';
 // Set timezone to UTC
 date_default_timezone_set('UTC');
 
-// Handle chat requests
-if (isset($_POST['action']) && $_POST['action'] === 'chat') {
+if (!isset($_SESSION['messages'])) {
+    $_SESSION['messages'] = [];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
-    
-    $message = $_POST['message'] ?? '';
-    $workspaceSlug = $_POST['workspace'] ?? $DEFAULT_WORKSPACE;
-    $sessionId = $_SESSION['chat_session_id'] ?? uniqid('session_');
-    
-    $_SESSION['chat_session_id'] = $sessionId;
-    
-    $url = "$BASE_URL/api/v1/workspace/$workspaceSlug/chat";
-    
-    $postData = [
-        'message' => $message,
-        'mode' => 'chat',
-        'sessionId' => $sessionId
-    ];
-    
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $API_KEY,
-        'Accept: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $action = $_POST['action'] ?? '';
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
+    if ($action === 'chat') {
+        $message = $_POST['message'] ?? '';
+        $messageId = $_POST['messageId'] ?? uniqid('msg_');
+        $workspaceSlug = $_POST['workspace'] ?? $DEFAULT_WORKSPACE;
+        $sessionId = $_SESSION['chat_session_id'] ?? uniqid('session_');
 
-    if ($curlError) {
-        echo json_encode(['error' => 'Erreur de connexion: ' . $curlError]);
+        $_SESSION['chat_session_id'] = $sessionId;
+        $_SESSION['messages'][$messageId] = [
+            'current' => $message,
+            'revisions' => $_SESSION['messages'][$messageId]['revisions'] ?? []
+        ];
+
+        $url = "$BASE_URL/api/v1/workspace/$workspaceSlug/chat";
+        $postData = [
+            'message' => $message,
+            'mode' => 'chat',
+            'sessionId' => $sessionId
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $API_KEY,
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            echo json_encode(['error' => 'Erreur de connexion: ' . $curlError]);
+            exit;
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            echo json_encode(['error' => 'Erreur HTTP: ' . $httpCode]);
+            exit;
+        }
+
+        $responseData = json_decode($response, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo json_encode(['error' => 'Format de réponse invalide']);
+            exit;
+        }
+
+        $assistantMessage =
+            $responseData['textResponse'] ??
+            $responseData['response'] ??
+            $responseData['message'] ??
+            'Aucune réponse reçue';
+
+        echo json_encode([
+            'success' => true,
+            'message' => $assistantMessage
+        ]);
         exit;
     }
 
-    if ($httpCode < 200 || $httpCode >= 300) {
-        echo json_encode(['error' => 'Erreur HTTP: ' . $httpCode]);
+    if ($action === 'edit') {
+        $messageId = $_POST['messageId'] ?? '';
+        $newMessage = $_POST['newMessage'] ?? '';
+        if ($messageId && isset($_SESSION['messages'][$messageId])) {
+            $current = $_SESSION['messages'][$messageId]['current'];
+            $_SESSION['messages'][$messageId]['revisions'][] = $current;
+            $_SESSION['messages'][$messageId]['current'] = $newMessage;
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['error' => 'Message introuvable']);
+        }
         exit;
     }
 
-    $responseData = json_decode($response, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        echo json_encode(['error' => 'Format de réponse invalide']);
+    if ($action === 'history') {
+        $messageId = $_POST['messageId'] ?? '';
+        if ($messageId && isset($_SESSION['messages'][$messageId])) {
+            echo json_encode([
+                'success' => true,
+                'revisions' => $_SESSION['messages'][$messageId]['revisions']
+            ]);
+        } else {
+            echo json_encode(['error' => 'Aucune révision']);
+        }
         exit;
     }
 
-    $assistantMessage =
-        $responseData['textResponse'] ??
-        $responseData['response'] ??
-        $responseData['message'] ??
-        'Aucune réponse reçue';
+    if ($action === 'restore') {
+        $messageId = $_POST['messageId'] ?? '';
+        $index = intval($_POST['index'] ?? -1);
+        if (
+            $messageId &&
+            isset($_SESSION['messages'][$messageId]) &&
+            isset($_SESSION['messages'][$messageId]['revisions'][$index])
+        ) {
+            $current = $_SESSION['messages'][$messageId]['current'];
+            $selected = $_SESSION['messages'][$messageId]['revisions'][$index];
+            $_SESSION['messages'][$messageId]['revisions'][] = $current;
+            $_SESSION['messages'][$messageId]['current'] = $selected;
+            echo json_encode(['success' => true, 'message' => $selected]);
+        } else {
+            echo json_encode(['error' => 'Révision introuvable']);
+        }
+        exit;
+    }
 
-    echo json_encode([
-        'success' => true,
-        'message' => $assistantMessage
-    ]);
+    echo json_encode(['error' => 'Action inconnue']);
     exit;
 }
 ?>
