@@ -313,9 +313,15 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     scrollToBottom() {
         const chatMessages = document.getElementById('chatMessages');
         if (chatMessages) {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
+            requestAnimationFrame(() => {
+                // Prefer scrollTo with smooth behavior if supported
+                if ('scrollTo' in chatMessages) {
+                    chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+                } else {
+                    // Fallback for older browsers
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
         }
     }
 
