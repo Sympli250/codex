@@ -298,8 +298,9 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         
         if (!statusDot || !statusText) return;
 
+        statusDot.classList.remove('error');
+
         if (connected === true) {
-            statusDot.classList.remove('error');
             statusText.textContent = text || 'Connecté';
         } else if (connected === false) {
             statusDot.classList.add('error');
