@@ -49,22 +49,24 @@ body {
     transition: background 0.3s ease;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 20% 50%, rgba(15, 118, 110, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.15) 0%, transparent 50%);
-    animation: moveGradient 20s ease infinite;
-    pointer-events: none;
-    z-index: -1;
-}
+@media (prefers-reduced-motion: no-preference) {
+    body::before {
+        content: '';
+        position: fixed;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 20% 50%, rgba(15, 118, 110, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.15) 0%, transparent 50%);
+        animation: moveGradient 20s ease infinite;
+        pointer-events: none;
+        z-index: -1;
+    }
 
-@keyframes moveGradient {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(-10%, -10%) rotate(120deg); }
-    66% { transform: translate(10%, -10%) rotate(240deg); }
+    @keyframes moveGradient {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(-10%, -10%) rotate(120deg); }
+        66% { transform: translate(10%, -10%) rotate(240deg); }
+    }
 }
 
 /* Symplissime branding */
