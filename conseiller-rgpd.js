@@ -9,6 +9,10 @@ class ConseillerRGPDApp {
         this.fontScale = 1;
         this.isProcessing = false;
         this.messageHistory = [];
+        // Cache frequently accessed DOM elements
+        this.messageInput = document.getElementById('messageInput');
+        this.sendButton = document.getElementById('sendButton');
+        this.chatMessages = document.getElementById('chatMessages');
         
         this.init();
     }
@@ -53,7 +57,7 @@ class ConseillerRGPDApp {
 
     handleKeyboardShortcuts(e) {
         // Press "/" to focus input
-        if (e.key === '/' && document.activeElement !== this.getMessageInput()) {
+        if (e.key === '/' && document.activeElement !== this.messageInput) {
             e.preventDefault();
             this.focusInput();
         }
@@ -73,7 +77,7 @@ class ConseillerRGPDApp {
         
         if (this.isProcessing) return;
         
-        const messageInput = this.getMessageInput();
+        const messageInput = this.messageInput;
         const message = messageInput.value.trim();
         
         if (!message) {
@@ -138,8 +142,8 @@ class ConseillerRGPDApp {
 
     setProcessingState(processing) {
         this.isProcessing = processing;
-        const messageInput = this.getMessageInput();
-        const sendButton = document.getElementById('sendButton');
+        const messageInput = this.messageInput;
+        const sendButton = this.sendButton;
         
         if (messageInput) {
             messageInput.disabled = processing;
@@ -158,7 +162,7 @@ class ConseillerRGPDApp {
     }
 
     addMessage(content, isUser = false, isError = false) {
-        const chatMessages = document.getElementById('chatMessages');
+        const chatMessages = this.chatMessages;
         if (!chatMessages) return;
 
         const wrapper = document.createElement('div');
@@ -225,7 +229,7 @@ class ConseillerRGPDApp {
     }
 
     showTyping() {
-        const chatMessages = document.getElementById('chatMessages');
+        const chatMessages = this.chatMessages;
         if (!chatMessages) return;
 
         // Supprimer l'indicateur existant s'il y en a un
@@ -312,7 +316,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     }
 
     scrollToBottom() {
-        const chatMessages = document.getElementById('chatMessages');
+        const chatMessages = this.chatMessages;
         if (chatMessages) {
             requestAnimationFrame(() => {
                 // Prefer scrollTo with smooth behavior if supported
@@ -327,14 +331,10 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     }
 
     focusInput() {
-        const messageInput = this.getMessageInput();
+        const messageInput = this.messageInput;
         if (messageInput && !messageInput.disabled) {
             messageInput.focus();
         }
-    }
-
-    getMessageInput() {
-        return document.getElementById('messageInput');
     }
 
     // Méthodes utilitaires
@@ -456,7 +456,7 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
     // Méthode pour vider l'historique
     clearHistory() {
         if (confirm('Êtes-vous sûr de vouloir effacer l\'historique de conversation ?')) {
-            const chatMessages = document.getElementById('chatMessages');
+            const chatMessages = this.chatMessages;
             if (chatMessages) {
                 chatMessages.innerHTML = '';
             }
