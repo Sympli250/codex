@@ -23,8 +23,9 @@ class ConseillerRGPDApp {
         this.fontScale = 1;
         this.isProcessing = false;
         this.messageHistory = [];
-        this.colorThemes = ['', 'theme-ocean', 'theme-forest', 'theme-sunset', 'theme-glass', 'theme-plasma', 'theme-genmoji', 'theme-neon', 'theme-holo'];
+        this.themes = window.RGPD_THEMES || [];
         this.fontClasses = ['font-inter', 'font-roboto', 'font-lato', 'font-poppins', 'font-jetbrains'];
+        this.debugLog = [];
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -35,12 +36,14 @@ class ConseillerRGPDApp {
         this.datetimeElement = document.getElementById('datetime');
         this.themeMenu = document.getElementById('themeMenu');
         this.fontMenu = document.getElementById('fontMenu');
+        this.debugPanel = document.getElementById('debugPanel');
         
         this.init();
     }
 
     init() {
         this.loadSavedPreferences();
+        this.buildThemeMenu();
         this.bindEvents();
         this.updateDateTime();
         this.showWelcomeMessage();
@@ -68,14 +71,24 @@ class ConseillerRGPDApp {
         }
 
         const savedColorTheme = localStorage.getItem('rgpd_colorTheme');
-        if (savedColorTheme && this.colorThemes.includes(savedColorTheme)) {
-            document.body.classList.add(savedColorTheme);
-        }
+        this.applyColorTheme(savedColorTheme || '', true);
 
         const savedFont = localStorage.getItem('rgpd_font');
         if (savedFont && this.fontClasses.includes(savedFont)) {
             document.body.classList.add(savedFont);
         }
+    }
+
+    buildThemeMenu() {
+        if (!this.themeMenu) return;
+        this.themeMenu.innerHTML = '';
+        this.themes.forEach(theme => {
+            const option = document.createElement('div');
+            option.className = 'theme-option';
+            option.setAttribute('data-theme', theme.id);
+            option.textContent = theme.name;
+            this.themeMenu.appendChild(option);
+        });
     }
 
     bindEvents() {
@@ -312,6 +325,11 @@ class ConseillerRGPDApp {
         
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
+        if (isUser) {
+            this.logAction(`Utilisateur: ${content}`);
+        } else if (isError) {
+            this.logAction(`Erreur: ${content}`);
+        }
 
         this.scrollToBottom();
         return message;
@@ -351,6 +369,7 @@ class ConseillerRGPDApp {
             if (this.messageHistory.length > 0) {
                 this.messageHistory[this.messageHistory.length - 1].content = fullText;
             }
+            this.logAction(`Bot: ${fullText}`);
         }
     }
 
@@ -432,6 +451,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
 
         setTimeout(() => {
             this.addMessage(welcomeMessage, false);
+            this.logAction(`Bot: ${welcomeMessage}`);
             this.updateStatus(true, 'Connecté');
         }, 1000);
     }
@@ -497,9 +517,11 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         try {
             await navigator.clipboard.writeText(text);
             this.showToast('Copié dans le presse-papiers !', 'success');
+            this.logAction('Copie dans le presse-papiers');
         } catch (err) {
             console.error('Erreur de copie:', err);
             this.showToast('Échec de la copie', 'error');
+            this.logAction('Erreur de copie');
         }
     }
 
@@ -518,9 +540,11 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             this.showToast('Fichier enregistré !', 'success');
+            this.logAction('Enregistrement dans un fichier');
         } catch (err) {
             console.error('Erreur de sauvegarde:', err);
             this.showToast('Erreur lors de la sauvegarde', 'error');
+            this.logAction('Erreur de sauvegarde');
         }
     }
 
@@ -531,9 +555,11 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
             window.location.href = mailtoLink;
             this.showToast('Ouverture du client mail...', 'success');
+            this.logAction('Envoi par email');
         } catch (err) {
             console.error('Erreur email:', err);
             this.showToast('Erreur lors de l\'ouverture du mail', 'error');
+            this.logAction('Erreur email');
         }
     }
 
@@ -556,6 +582,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             this.fontScale += 0.1;
             this.updateFontScale();
             this.showToast('Taille du texte augmentée', 'success');
+            this.logAction('Augmentation de la taille du texte');
         } else {
             this.showToast('Taille maximale atteinte', 'warning');
         }
@@ -566,6 +593,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             this.fontScale -= 0.1;
             this.updateFontScale();
             this.showToast('Taille du texte réduite', 'success');
+            this.logAction('Réduction de la taille du texte');
         } else {
             this.showToast('Taille minimale atteinte', 'warning');
         }
@@ -584,6 +612,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             themeToggle.textContent = isLight ? '☀️' : '🌙';
         }
         this.showToast(isLight ? 'Thème clair activé' : 'Thème sombre activé', 'success');
+        this.logAction(`Mode clair: ${isLight}`);
     }
 
     toggleThemeMenu() {
@@ -610,6 +639,24 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         }
     }
 
+    toggleDebug() {
+        if (this.debugPanel) {
+            this.debugPanel.classList.toggle('hidden');
+        }
+    }
+
+    logAction(action) {
+        const timestamp = new Date().toLocaleTimeString();
+        const entry = `[${timestamp}] ${action}`;
+        this.debugLog.push(entry);
+        if (this.debugPanel) {
+            const div = document.createElement('div');
+            div.textContent = entry;
+            this.debugPanel.appendChild(div);
+            this.debugPanel.scrollTop = this.debugPanel.scrollHeight;
+        }
+    }
+
     applyFont(font) {
         document.body.classList.remove(...this.fontClasses);
         if (font) {
@@ -625,16 +672,18 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         };
         const fontName = fontMap[font] || 'défaut';
         this.showToast(`Police ${fontName} activée`, 'success');
+        this.logAction(`Police changée: ${fontName}`);
     }
 
-    applyColorTheme(theme) {
-        document.body.classList.remove(...this.colorThemes.filter(t => t));
-        if (theme) {
-            document.body.classList.add(theme);
+    applyColorTheme(themeId, silent = false) {
+        const theme = this.themes.find(t => t.id === themeId) || this.themes[0];
+        const root = document.documentElement;
+        Object.entries(theme.vars).forEach(([key, val]) => root.style.setProperty(key, val));
+        localStorage.setItem('rgpd_colorTheme', themeId);
+        if (!silent) {
+            this.showToast(`Thème ${theme.name} activé`, 'success');
         }
-        localStorage.setItem('rgpd_colorTheme', theme);
-        const themeName = theme ? theme.split('-')[1] : 'par défaut';
-        this.showToast(`Thème ${themeName} activé`, 'success');
+        this.logAction(`Thème changé: ${theme.name}`);
     }
 
     // Méthode pour exporter tout l'historique
@@ -662,6 +711,7 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
 `;
 
         this.saveAsFile(header + history, `historique-rgpd-${new Date().toISOString().slice(0, 10)}.txt`);
+        this.logAction('Export de l\'historique de conversation');
     }
 
     // Méthode pour vider l'historique
@@ -674,6 +724,7 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
             this.messageHistory = [];
             this.showWelcomeMessage();
             this.showToast('Historique effacé', 'success');
+            this.logAction('Historique effacé');
         }
     }
 }
@@ -692,6 +743,7 @@ window.rgpdApp = {
     toggleTheme: () => rgpdApp?.toggleTheme(),
     toggleThemeMenu: () => rgpdApp?.toggleThemeMenu(),
     toggleFontMenu: () => rgpdApp?.toggleFontMenu(),
+    toggleDebug: () => rgpdApp?.toggleDebug(),
     exportHistory: () => rgpdApp?.exportChatHistory(),
     clearHistory: () => rgpdApp?.clearHistory()
 };
