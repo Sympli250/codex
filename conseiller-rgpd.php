@@ -121,17 +121,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         <button class="control-btn" onclick="rgpdApp.toggleTheme()" title="Basculer le thème" id="themeToggle">🌙</button>
         <button class="control-btn" onclick="rgpdApp.toggleThemeMenu()" title="Changer le thème de couleur" id="colorThemeToggle">🎨</button>
         <button class="control-btn" onclick="rgpdApp.toggleFontMenu()" title="Changer la police" id="fontToggle">🅰️</button>
-        <div class="theme-menu hidden" id="themeMenu">
-            <div class="theme-option" data-theme="">Défaut</div>
-            <div class="theme-option" data-theme="theme-ocean">Océan</div>
-            <div class="theme-option" data-theme="theme-forest">Forêt</div>
-            <div class="theme-option" data-theme="theme-sunset">Crépuscule</div>
-            <div class="theme-option" data-theme="theme-glass">Glass</div>
-            <div class="theme-option" data-theme="theme-plasma">Plasma</div>
-            <div class="theme-option" data-theme="theme-genmoji">Genmoji</div>
-            <div class="theme-option" data-theme="theme-neon">Néon</div>
-            <div class="theme-option" data-theme="theme-holo">Holo</div>
-        </div>
+        <button class="control-btn" onclick="rgpdApp.toggleDebug()" title="Ouvrir le debug" id="debugToggle">🐞</button>
+        <div class="theme-menu hidden" id="themeMenu"></div>
         <div class="theme-menu hidden" id="fontMenu">
             <div class="theme-option" data-font="font-inter">Inter</div>
             <div class="theme-option" data-font="font-roboto">Roboto</div>
@@ -190,6 +181,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     </div>
     
     <div class="toast" id="toast"></div>
+    <div class="debug-panel hidden" id="debugPanel"></div>
 
     <!-- Configuration JavaScript -->
     <script>
@@ -204,6 +196,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
       <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/typogr@0.6.7/typogr.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+      <script src="themes.js"></script>
       <script src="conseiller-rgpd.js"></script>
   </body>
 </html>
