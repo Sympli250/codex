@@ -1,6 +1,7 @@
 /**
  * Conseiller RGPD IA - Application JavaScript
  * Powered by Symplissime AI
+ * Version 3.0
  */
 
 class ConseillerRGPDApp {
@@ -13,6 +14,10 @@ class ConseillerRGPDApp {
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
         this.chatMessages = document.getElementById('chatMessages');
+        this.statusDot = document.getElementById('statusDot');
+        this.statusText = document.getElementById('statusText');
+        this.toast = document.getElementById('toast');
+        this.datetimeElement = document.getElementById('datetime');
         
         this.init();
     }
@@ -282,8 +287,8 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     }
 
     updateDateTime() {
-        const datetimeElement = document.getElementById('datetime');
-        if (!datetimeElement) return;
+        const el = this.datetimeElement;
+        if (!el) return;
 
         const now = new Date();
         const year = now.getUTCFullYear();
@@ -292,14 +297,14 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         const hours = String(now.getUTCHours()).padStart(2, '0');
         const minutes = String(now.getUTCMinutes()).padStart(2, '0');
         const seconds = String(now.getUTCSeconds()).padStart(2, '0');
-        
-        datetimeElement.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+        el.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
     updateStatus(connected, text = null) {
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        
+        const statusDot = this.statusDot;
+        const statusText = this.statusText;
+
         if (!statusDot || !statusText) return;
 
         statusDot.classList.remove('error');
@@ -383,13 +388,13 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     }
 
     showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
+        const toast = this.toast;
         if (!toast) return;
 
         toast.textContent = message;
         toast.className = `toast ${type}`;
         toast.classList.add('show');
-        
+
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);

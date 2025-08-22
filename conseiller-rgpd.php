@@ -6,6 +6,7 @@ $BASE_URL = 'http://storage.symplissime.fr:3002';
 $API_KEY = 'DV90GFR-8YR4RW2-G9BMCQ9-9X96PW5';
 $DEFAULT_WORKSPACE = 'expert-rgpd';
 $CURRENT_USER = 'Consultant';
+$APP_VERSION = '3.0';
 
 // Set timezone to UTC
 date_default_timezone_set('UTC');
@@ -92,7 +93,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conseiller RGPD IA - Powered by Symplissime AI</title>
+    <title>Conseiller RGPD IA v<?php echo htmlspecialchars($APP_VERSION); ?> - Powered by Symplissime AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="conseiller-rgpd.css">
 </head>
@@ -116,7 +117,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                 <div class="header-left">
                     <div class="logo">R</div>
                     <div class="header-info">
-                        <h1>Conseiller RGPD IA</h1>
+                        <h1>Conseiller RGPD IA <span class="version-badge">v<?php echo htmlspecialchars($APP_VERSION); ?></span></h1>
                         <div class="subtitle">
                             <span>👤 Utilisateur : <?php echo htmlspecialchars($CURRENT_USER); ?></span>
                             <span>🛡️ Expert en protection des données</span>
@@ -165,7 +166,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         window.RGPD_CONFIG = {
             WORKSPACE: '<?php echo $DEFAULT_WORKSPACE; ?>',
             USER: '<?php echo htmlspecialchars($CURRENT_USER); ?>',
-            API_ENDPOINT: '<?php echo $_SERVER['PHP_SELF']; ?>'
+            API_ENDPOINT: '<?php echo $_SERVER['PHP_SELF']; ?>',
+            VERSION: '<?php echo $APP_VERSION; ?>'
         };
     </script>
     
