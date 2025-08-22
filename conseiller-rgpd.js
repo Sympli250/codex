@@ -23,7 +23,8 @@ class ConseillerRGPDApp {
         this.fontScale = 1;
         this.isProcessing = false;
         this.messageHistory = [];
-        this.colorThemes = ['', 'theme-ocean', 'theme-forest', 'theme-sunset'];
+        this.colorThemes = ['', 'theme-ocean', 'theme-forest', 'theme-sunset', 'theme-glass', 'theme-plasma', 'theme-genmoji', 'theme-neon', 'theme-holo'];
+        this.fontClasses = ['font-inter', 'font-roboto', 'font-lato', 'font-poppins', 'font-jetbrains'];
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -33,6 +34,7 @@ class ConseillerRGPDApp {
         this.toast = document.getElementById('toast');
         this.datetimeElement = document.getElementById('datetime');
         this.themeMenu = document.getElementById('themeMenu');
+        this.fontMenu = document.getElementById('fontMenu');
         
         this.init();
     }
@@ -69,6 +71,11 @@ class ConseillerRGPDApp {
         if (savedColorTheme && this.colorThemes.includes(savedColorTheme)) {
             document.body.classList.add(savedColorTheme);
         }
+
+        const savedFont = localStorage.getItem('rgpd_font');
+        if (savedFont && this.fontClasses.includes(savedFont)) {
+            document.body.classList.add(savedFont);
+        }
     }
 
     bindEvents() {
@@ -104,6 +111,23 @@ class ConseillerRGPDApp {
                 const toggle = document.getElementById('colorThemeToggle');
                 if (toggle && !this.themeMenu.contains(e.target) && e.target !== toggle) {
                     this.hideThemeMenu();
+                }
+            });
+        }
+
+        if (this.fontMenu) {
+            this.fontMenu.addEventListener('click', (e) => {
+                const font = e.target.getAttribute('data-font');
+                if (font !== null) {
+                    this.applyFont(font);
+                    this.hideFontMenu();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                const toggle = document.getElementById('fontToggle');
+                if (toggle && !this.fontMenu.contains(e.target) && e.target !== toggle) {
+                    this.hideFontMenu();
                 }
             });
         }
@@ -574,8 +598,37 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         }
     }
 
+    toggleFontMenu() {
+        if (this.fontMenu) {
+            this.fontMenu.classList.toggle('hidden');
+        }
+    }
+
+    hideFontMenu() {
+        if (this.fontMenu) {
+            this.fontMenu.classList.add('hidden');
+        }
+    }
+
+    applyFont(font) {
+        document.body.classList.remove(...this.fontClasses);
+        if (font) {
+            document.body.classList.add(font);
+        }
+        localStorage.setItem('rgpd_font', font);
+        const fontMap = {
+            'font-inter': 'Inter',
+            'font-roboto': 'Roboto',
+            'font-lato': 'Lato',
+            'font-poppins': 'Poppins',
+            'font-jetbrains': 'JetBrains Mono'
+        };
+        const fontName = fontMap[font] || 'défaut';
+        this.showToast(`Police ${fontName} activée`, 'success');
+    }
+
     applyColorTheme(theme) {
-        document.body.classList.remove('theme-ocean', 'theme-forest', 'theme-sunset');
+        document.body.classList.remove(...this.colorThemes.filter(t => t));
         if (theme) {
             document.body.classList.add(theme);
         }
@@ -638,6 +691,7 @@ window.rgpdApp = {
     decreaseFontSize: () => rgpdApp?.decreaseFontSize(),
     toggleTheme: () => rgpdApp?.toggleTheme(),
     toggleThemeMenu: () => rgpdApp?.toggleThemeMenu(),
+    toggleFontMenu: () => rgpdApp?.toggleFontMenu(),
     exportHistory: () => rgpdApp?.exportChatHistory(),
     clearHistory: () => rgpdApp?.clearHistory()
 };
