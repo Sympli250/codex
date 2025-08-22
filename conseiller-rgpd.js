@@ -1,3 +1,4 @@
+
 /**
  * Conseiller RGPD IA - Application JavaScript
  * Powered by Symplissime AI
@@ -524,3 +525,22 @@ window.rgpdApp = {
     exportHistory: () => rgpdApp?.exportChatHistory(),
     clearHistory: () => rgpdApp?.clearHistory()
 };
+
+// Service Worker registration with development safeguard
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+        if (isLocalhost) {
+            console.log('Service Worker disabled for development environment');
+        } else {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => {
+                    console.log('Service Worker registered successfully');
+                })
+                .catch(error => {
+                    console.error('SW registration failed:', error);
+                });
+        }
+    });
+}
