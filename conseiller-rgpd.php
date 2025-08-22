@@ -103,7 +103,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conseiller RGPD IA v<?php echo htmlspecialchars($APP_VERSION); ?> - Powered by Symplissime AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="conseiller-rgpd.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
@@ -120,11 +120,24 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         <button class="control-btn" onclick="rgpdApp.increaseFontSize()" title="Agrandir le texte">A+</button>
         <button class="control-btn" onclick="rgpdApp.toggleTheme()" title="Basculer le thème" id="themeToggle">🌙</button>
         <button class="control-btn" onclick="rgpdApp.toggleThemeMenu()" title="Changer le thème de couleur" id="colorThemeToggle">🎨</button>
+        <button class="control-btn" onclick="rgpdApp.toggleFontMenu()" title="Changer la police" id="fontToggle">🅰️</button>
         <div class="theme-menu hidden" id="themeMenu">
             <div class="theme-option" data-theme="">Défaut</div>
             <div class="theme-option" data-theme="theme-ocean">Océan</div>
             <div class="theme-option" data-theme="theme-forest">Forêt</div>
             <div class="theme-option" data-theme="theme-sunset">Crépuscule</div>
+            <div class="theme-option" data-theme="theme-glass">Glass</div>
+            <div class="theme-option" data-theme="theme-plasma">Plasma</div>
+            <div class="theme-option" data-theme="theme-genmoji">Genmoji</div>
+            <div class="theme-option" data-theme="theme-neon">Néon</div>
+            <div class="theme-option" data-theme="theme-holo">Holo</div>
+        </div>
+        <div class="theme-menu hidden" id="fontMenu">
+            <div class="theme-option" data-font="font-inter">Inter</div>
+            <div class="theme-option" data-font="font-roboto">Roboto</div>
+            <div class="theme-option" data-font="font-lato">Lato</div>
+            <div class="theme-option" data-font="font-poppins">Poppins</div>
+            <div class="theme-option" data-font="font-jetbrains">JetBrains Mono</div>
         </div>
     </div>
     
