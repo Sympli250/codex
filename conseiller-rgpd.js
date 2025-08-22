@@ -24,7 +24,6 @@ class ConseillerRGPDApp {
         this.isProcessing = false;
         this.messageHistory = [];
         this.colorThemes = ['', 'theme-ocean', 'theme-forest', 'theme-sunset'];
-        this.currentColorThemeIndex = 0;
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -33,6 +32,7 @@ class ConseillerRGPDApp {
         this.statusText = document.getElementById('statusText');
         this.toast = document.getElementById('toast');
         this.datetimeElement = document.getElementById('datetime');
+        this.themeMenu = document.getElementById('themeMenu');
         
         this.init();
     }
@@ -68,7 +68,6 @@ class ConseillerRGPDApp {
         const savedColorTheme = localStorage.getItem('rgpd_colorTheme');
         if (savedColorTheme && this.colorThemes.includes(savedColorTheme)) {
             document.body.classList.add(savedColorTheme);
-            this.currentColorThemeIndex = this.colorThemes.indexOf(savedColorTheme);
         }
     }
 
@@ -89,6 +88,23 @@ class ConseillerRGPDApp {
                     this.messageInput.classList.toggle('typing', hasText);
                     this.updateSendButtonState();
                 });
+            });
+        }
+
+        if (this.themeMenu) {
+            this.themeMenu.addEventListener('click', (e) => {
+                const theme = e.target.getAttribute('data-theme');
+                if (theme !== null) {
+                    this.applyColorTheme(theme);
+                    this.hideThemeMenu();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                const toggle = document.getElementById('colorThemeToggle');
+                if (toggle && !this.themeMenu.contains(e.target) && e.target !== toggle) {
+                    this.hideThemeMenu();
+                }
             });
         }
 
@@ -546,10 +562,20 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         this.showToast(isLight ? 'Thème clair activé' : 'Thème sombre activé', 'success');
     }
 
-    cycleColorTheme() {
+    toggleThemeMenu() {
+        if (this.themeMenu) {
+            this.themeMenu.classList.toggle('hidden');
+        }
+    }
+
+    hideThemeMenu() {
+        if (this.themeMenu) {
+            this.themeMenu.classList.add('hidden');
+        }
+    }
+
+    applyColorTheme(theme) {
         document.body.classList.remove('theme-ocean', 'theme-forest', 'theme-sunset');
-        this.currentColorThemeIndex = (this.currentColorThemeIndex + 1) % this.colorThemes.length;
-        const theme = this.colorThemes[this.currentColorThemeIndex];
         if (theme) {
             document.body.classList.add(theme);
         }
@@ -611,7 +637,7 @@ window.rgpdApp = {
     increaseFontSize: () => rgpdApp?.increaseFontSize(),
     decreaseFontSize: () => rgpdApp?.decreaseFontSize(),
     toggleTheme: () => rgpdApp?.toggleTheme(),
-    cycleColorTheme: () => rgpdApp?.cycleColorTheme(),
+    toggleThemeMenu: () => rgpdApp?.toggleThemeMenu(),
     exportHistory: () => rgpdApp?.exportChatHistory(),
     clearHistory: () => rgpdApp?.clearHistory()
 };
