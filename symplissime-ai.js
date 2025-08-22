@@ -551,47 +551,50 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
         setTimeout(async () => {
             await this.streamMessage(welcomeMessage);
+            this.insertCarousel(true, true);
             this.updateStatus(true, 'Connecté');
         }, 1000);
     }
-    insertCarousel(withQuestion = false) {
+    insertCarousel(withQuestion = false, appendToLast = false) {
         const carouselHTML = `
         <div class="carousel-container" role="region" aria-label="Mini carousel d'ordinateurs portables">
-            <div class="carousel-track" role="list">
-                <div class="carousel-item" role="listitem" aria-label="Slide 1: Elegant Laptop">
+            <div class="carousel-items">
+                <div class="carousel-card" role="listitem">
                     <img loading="lazy" src="https://images.pexels.com/photos/40185/mac-freelancer-macintosh-macbook-40185.jpeg?auto=compress&cs=tinysrgb&h=150" alt="Ordinateur Portable 1">
-                    <div class="item-text">
+                    <div class="card-text">
                         <h3>Portable Élégant</h3>
                         <p>Design moderne pour pros.</p>
                     </div>
                 </div>
-                <div class="carousel-item" role="listitem" aria-label="Slide 2: High Performance Laptop">
+                <div class="carousel-card" role="listitem">
                     <img loading="lazy" src="https://placehold.co/240x150/d97706/ffffff?text=Laptop+2" alt="Ordinateur Portable 2">
-                    <div class="item-text">
+                    <div class="card-text">
                         <h3>Laptop Performant</h3>
                         <p>Pour gaming et vidéo.</p>
                     </div>
                 </div>
-                <div class="carousel-item" role="listitem" aria-label="Slide 3: Lightweight Ultrabook">
+                <div class="carousel-card" role="listitem">
                     <img loading="lazy" src="https://placehold.co/240x150/059669/ffffff?text=Laptop+3" alt="Ordinateur Portable 3">
-                    <div class="item-text">
+                    <div class="card-text">
                         <h3>Ultrabook Léger</h3>
                         <p>Parfaitement portable.</p>
                     </div>
                 </div>
-            </div>
-            <button class="prev-button" aria-label="Diapositive précédente">‹</button>
-            <button class="next-button" aria-label="Diapositive suivante">›</button>
-            <div class="carousel-dots">
-                <span class="dot active" data-index="0"></span>
-                <span class="dot" data-index="1"></span>
-                <span class="dot" data-index="2"></span>
             </div>
         </div>`;
 
         const content = withQuestion
             ? `<p class="carousel-question">Avez-vous besoin de matériel ?</p>${carouselHTML}`
             : carouselHTML;
+
+        if (appendToLast) {
+            const lastMessage = document.querySelector('#chatMessages .message-wrapper:last-child .message');
+            if (lastMessage) {
+                lastMessage.innerHTML += DOMPurify.sanitize(content);
+                this.initCarousel(lastMessage.querySelector('.carousel-container'));
+                return;
+            }
+        }
 
         const wrapper = this.createMessageElement('', false, false);
         const messageDiv = wrapper.querySelector('.message');
@@ -602,106 +605,15 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
     initCarousel(container) {
         if (!container) return;
-        const track = container.querySelector('.carousel-track');
-        const items = Array.from(container.querySelectorAll('.carousel-item'));
-        const prevButton = container.querySelector('.prev-button');
-        const nextButton = container.querySelector('.next-button');
-        const dots = container.querySelectorAll('.dot');
-        let currentIndex = 0;
-        let autoplayInterval = null;
+        const scroller = container.querySelector('.carousel-items');
+        if (!scroller) return;
 
-        const updateCarousel = () => {
-            const itemWidth = items[0].getBoundingClientRect().width;
-            track.style.transform = `translateX(-${currentIndex * itemWidth}px)`;
-            updateDots();
-        };
-
-        const updateDots = () => {
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentIndex);
-            });
-        };
-
-        const startAutoplay = () => {
-            autoplayInterval = setInterval(() => {
-                currentIndex = (currentIndex + 1) % items.length;
-                updateCarousel();
-            }, 3000);
-        };
-
-        const stopAutoplay = () => {
-            clearInterval(autoplayInterval);
-        };
-
-        nextButton.addEventListener('click', () => {
-            currentIndex = (currentIndex + 1) % items.length;
-            updateCarousel();
-            stopAutoplay();
-            startAutoplay();
-        });
-
-        prevButton.addEventListener('click', () => {
-            currentIndex = (currentIndex - 1 + items.length) % items.length;
-            updateCarousel();
-            stopAutoplay();
-            startAutoplay();
-        });
-
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                currentIndex = parseInt(dot.getAttribute('data-index'));
-                updateCarousel();
-                stopAutoplay();
-                startAutoplay();
-            });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') {
-                currentIndex = (currentIndex + 1) % items.length;
-                updateCarousel();
-                stopAutoplay();
-                startAutoplay();
-            } else if (e.key === 'ArrowLeft') {
-                currentIndex = (currentIndex - 1 + items.length) % items.length;
-                updateCarousel();
-                stopAutoplay();
-                startAutoplay();
+        container.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                scroller.scrollLeft += e.deltaY;
             }
-        });
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-        track.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-        track.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchStartX - touchEndX > 50) {
-                currentIndex = (currentIndex + 1) % items.length;
-                updateCarousel();
-                stopAutoplay();
-                startAutoplay();
-            } else if (touchEndX - touchStartX > 50) {
-                currentIndex = (currentIndex - 1 + items.length) % items.length;
-                updateCarousel();
-                stopAutoplay();
-                startAutoplay();
-            }
-        });
-
-        container.addEventListener('mouseenter', stopAutoplay);
-        container.addEventListener('mouseleave', startAutoplay);
-
-        if (items.length <= 1) {
-            prevButton.style.display = 'none';
-            nextButton.style.display = 'none';
-            container.querySelector('.carousel-dots').style.display = 'none';
-        }
-
-        updateCarousel();
-        updateDots();
-        startAutoplay();
+        }, { passive: false });
     }
 
     updateDateTime() {

@@ -896,130 +896,79 @@ body {
 
 /* Mini carousel suggestions */
 .carousel-container {
-  position: relative;
-  width: 100%;
-  max-width: 260px;
-  overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  background-color: #fff;
-  padding: 6px;
+  margin-top: 8px;
 }
 
-.carousel-track {
+.carousel-items {
   display: flex;
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-.carousel-item {
-  min-width: 100%;
-  box-sizing: border-box;
-  text-align: center;
-  padding: 5px 0;
+.carousel-items::-webkit-scrollbar {
+  display: none;
 }
 
-.carousel-item img {
+.carousel-items {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel-card {
+  flex: 0 0 auto;
+  width: 160px;
+  background: var(--fluent-background-component);
+  border: 1px solid var(--fluent-border-color-light);
+  border-radius: 12px;
+  box-shadow: var(--fluent-shadow-sm);
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carousel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--fluent-shadow);
+}
+
+.carousel-card img {
   width: 100%;
-  max-width: 220px;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 6px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
+  height: 100px;
+  object-fit: cover;
 }
 
-.carousel-item img:hover {
-  transform: scale(1.03);
+.card-text {
+  padding: 8px;
 }
 
-.item-text h3 {
+.card-text h3 {
   margin: 0 0 4px;
   font-weight: 600;
-  color: #1e3a8a;
+  color: var(--c-pri-dark);
   font-size: 0.9rem;
 }
 
-.item-text p {
+.card-text p {
   margin: 0;
-  color: #666;
   font-size: 0.75rem;
+  color: var(--fluent-text-color);
   line-height: 1.3;
 }
 
-.prev-button,
-.next-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  border-radius: 50%;
-  transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.prev-button:hover,
-.next-button:hover {
-  background: rgba(0, 0, 0, 0.6);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.prev-button {
-  left: 10px;
-}
-
-.next-button {
-  right: 10px;
-}
-
-.carousel-dots {
-  text-align: center;
-  padding: 5px 0;
-}
-
-.dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 3px;
-  background: #ccc;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.dot.active {
-  background: #1e3a8a;
-}
-
 @media (max-width: 400px) {
-  .carousel-container {
-    padding: 4px;
+  .carousel-card {
+    width: 140px;
   }
-
-  .carousel-item img {
-    max-width: 180px;
-  }
-
-  .item-text h3 {
-    font-size: 0.85rem;
-  }
-
-  .item-text p {
-    font-size: 0.7rem;
-  }
-
-  .prev-button,
-  .next-button {
-    padding: 4px 8px;
-    font-size: 0.9rem;
+  .carousel-card img {
+    height: 90px;
   }
 }
 
 .carousel-question {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 500;
   font-size: 0.9rem;
 }
