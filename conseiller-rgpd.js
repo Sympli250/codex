@@ -28,7 +28,8 @@ class ConseillerRGPDApp {
         this.updateDateTime();
         this.showWelcomeMessage();
         this.focusInput();
-        
+        this.updateSendButtonState();
+
         // Mise à jour de l'heure chaque seconde
         setInterval(() => this.updateDateTime(), 1000);
     }
@@ -46,6 +47,19 @@ class ConseillerRGPDApp {
         const chatForm = document.getElementById('chatForm');
         if (chatForm) {
             chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        }
+
+        // Effets visuels pendant la frappe
+        if (this.messageInput) {
+            let inputRaf;
+            this.messageInput.addEventListener('input', () => {
+                cancelAnimationFrame(inputRaf);
+                inputRaf = requestAnimationFrame(() => {
+                    const hasText = this.messageInput.value.trim().length > 0;
+                    this.messageInput.classList.toggle('typing', hasText);
+                    this.updateSendButtonState();
+                });
+            });
         }
 
         // Raccourcis clavier
@@ -79,9 +93,9 @@ class ConseillerRGPDApp {
 
     async handleFormSubmit(e) {
         e.preventDefault();
-        
+
         if (this.isProcessing) return;
-        
+
         const messageInput = this.messageInput;
         const message = messageInput.value.trim();
         
@@ -96,6 +110,7 @@ class ConseillerRGPDApp {
         }
 
         messageInput.value = '';
+        this.updateSendButtonState();
         await this.sendMessage(message);
     }
 
@@ -162,8 +177,16 @@ class ConseillerRGPDApp {
                 sendButton.classList.remove('loading');
             }
         }
-        
+
         this.updateStatus(processing ? null : true, processing ? 'Traitement...' : 'Connecté');
+        this.updateSendButtonState();
+    }
+
+    updateSendButtonState() {
+        const sendButton = this.sendButton;
+        if (!sendButton) return;
+        const hasText = this.messageInput && this.messageInput.value.trim().length > 0;
+        sendButton.classList.toggle('active', hasText && !this.isProcessing && !sendButton.disabled);
     }
 
     addMessage(content, isUser = false, isError = false) {

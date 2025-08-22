@@ -34,7 +34,7 @@
 
 body {
     font-family: var(--font-sans);
-    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-dark-secondary) 50%, var(--border) 100%);
+    background: var(--bg-dark);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -46,7 +46,6 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background 0.3s ease;
 }
 
 
@@ -528,6 +527,12 @@ body {
     cursor: not-allowed;
 }
 
+/* Effet de frappe dans le champ de saisie */
+.message-input.typing {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+}
+
 .send-button {
     padding: 16px 32px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -543,6 +548,12 @@ body {
     gap: 8px;
     box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
     letter-spacing: 0.5px;
+}
+
+.send-button.active {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.4);
 }
 
 .send-button:hover:not(:disabled) {
