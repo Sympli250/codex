@@ -232,7 +232,9 @@ class ConseillerRGPDApp {
         if (!isUser && !isError) {
             let html;
             try {
-                html = DOMPurify.sanitize(marked.parse(content));
+                html = marked.parse(content);
+                html = DOMPurify.sanitize(html);
+                html = typogr.typogrify(html);
                 message.innerHTML = html;
             } catch (e) {
                 // Fallback: render as plain text if Markdown parsing fails
@@ -278,7 +280,9 @@ class ConseillerRGPDApp {
             const fullText = messageElement.textContent;
             let html;
             try {
-                html = DOMPurify.sanitize(marked.parse(fullText));
+                html = marked.parse(fullText);
+                html = DOMPurify.sanitize(html);
+                html = typogr.typogrify(html);
             } catch (e) {
                 html = DOMPurify.sanitize('<div class="error-message">Erreur lors de l\'affichage du message.</div>');
                 // Optionally, log the error for debugging:
