@@ -171,9 +171,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
             VERSION: '<?php echo $APP_VERSION; ?>'
         };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="conseiller-rgpd.js"></script>
-</body>
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/typogr@0.6.7/typogr.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+      <script src="conseiller-rgpd.js"></script>
+  </body>
 </html>
