@@ -5,6 +5,9 @@
 
 class SymplissimeAIApp {
     constructor() {
+        // Provide credentials like API_KEY via the global SYMPLISSIME_CONFIG
+        // object before loading this script, e.g.:
+        // window.SYMPLISSIME_CONFIG = { API_KEY: 'votre_cle', WORKSPACE: 'id', USER: 'nom' };
         this.config = window.SYMPLISSIME_CONFIG || {};
         this.fontScale = 1;
         this.isProcessing = false;
@@ -367,11 +370,23 @@ class SymplissimeAIApp {
                 headers
             });
 
+            const responseBody = await response.text();
+            console.log('Upload response body:', responseBody);
+
+            if (response.status === 403) {
+                this.addMessage('Accès refusé : clé API manquante ou invalide.', false, true);
+                this.updateStatus('error', 'Clé API invalide');
+                return;
+            }
+
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
 
-            const data = await response.json().catch(() => ({}));
+            let data = {};
+            try {
+                data = JSON.parse(responseBody);
+            } catch (e) {}
             const docId = data.documentId || data.id || '';
             const info = docId
                 ? `📄 Fichier ${file.name} téléchargé (ID: ${docId})`
