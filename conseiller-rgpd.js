@@ -5,6 +5,13 @@
  * Version 3.1
  */
 
+// Configuration de Marked pour la coloration syntaxique
+if (typeof marked !== 'undefined') {
+    marked.setOptions({
+        highlight: (code, lang) => hljs.highlightAuto(code).value
+    });
+}
+
 class ConseillerRGPDApp {
     constructor() {
         this.config = window.RGPD_CONFIG || {};
@@ -215,9 +222,14 @@ class ConseillerRGPDApp {
         
         const message = document.createElement('div');
         message.className = `message ${isUser ? 'user' : 'bot'} ${isError ? 'error' : ''}`;
-        
-        // Sécurisation du contenu
-        message.textContent = content;
+
+        // Sécurisation et rendu du contenu
+        if (!isUser && !isError) {
+            const html = DOMPurify.sanitize(marked.parse(content));
+            message.innerHTML = html;
+        } else {
+            message.textContent = content;
+        }
         
         messageContent.appendChild(message);
         
@@ -230,11 +242,35 @@ class ConseillerRGPDApp {
         wrapper.appendChild(avatar);
         wrapper.appendChild(messageContent);
         chatMessages.appendChild(wrapper);
+
+        // Coloration syntaxique pour les messages du bot
+        if (!isUser && !isError) {
+            wrapper.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
         
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
         
         this.scrollToBottom();
+    }
+
+    streamMessage(messageElement, text) {
+        if (messageElement) {
+            messageElement.textContent += text;
+        }
+    }
+
+    finishStreaming(messageElement) {
+        if (messageElement) {
+            const fullText = messageElement.textContent;
+            const html = DOMPurify.sanitize(marked.parse(fullText));
+            messageElement.innerHTML = html;
+            messageElement.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
     }
 
     createMessageActions(content) {
