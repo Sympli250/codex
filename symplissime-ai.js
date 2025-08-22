@@ -9,7 +9,8 @@ class SymplissimeAIApp {
         // object before loading this script, e.g.:
         // window.SYMPLISSIME_CONFIG = { API_KEY: 'votre_cle', WORKSPACE: 'id', USER: 'nom' };
         this.config = window.SYMPLISSIME_CONFIG || {};
-        this.fontScale = 1;
+        // Increase base font scale for better readability
+        this.fontScale = 1.1;
         this.isProcessing = false;
         this.messageHistory = [];
         this.currentStreamingMessage = null;
@@ -42,10 +43,21 @@ class SymplissimeAIApp {
                 icon: '🔥',
                 attribute: 'crimson-red'
             },
-            'dark': { 
-                name: 'Midnight Dark', 
+            'dark': {
+                name: 'Midnight Dark',
                 icon: '🌙',
                 attribute: 'midnight-dark'
+            },
+            // Additional themes
+            'forest': {
+                name: 'Forest Green',
+                icon: '🌲',
+                attribute: 'forest-theme'
+            },
+            'neon': {
+                name: 'Neon Lights',
+                icon: '🎇',
+                attribute: 'neon-theme'
             }
         };
         
@@ -355,19 +367,20 @@ class SymplissimeAIApp {
         // Convertir le contenu en HTML sécurisé avant le streaming
         const html = DOMPurify.sanitize(marked.parse(content));
 
-        // Variables pour le streaming caractère par caractère
+        // Variables pour le streaming par blocs
         const totalChars = html.length;
         let currentIndex = 0;
+        const chunkSize = 10; // nombre de caractères affichés à chaque tick
 
-        const streamNextChar = () => {
+        const streamNextChunk = () => {
             if (currentIndex < totalChars) {
-                messageContentDiv.innerHTML = html.slice(0, currentIndex + 1);
+                currentIndex = Math.min(currentIndex + chunkSize, totalChars);
+                messageContentDiv.innerHTML = html.slice(0, currentIndex);
                 this.scrollToBottom();
-                currentIndex++;
                 const progress = Math.round((currentIndex / totalChars) * 100);
                 this.updateStatus('processing', 'Réponse en cours', progress);
-                // Vitesse de streaming rapide par caractère
-                this.streamingInterval = setTimeout(streamNextChar, 5);
+                // Affichage quasi instantané
+                this.streamingInterval = setTimeout(streamNextChunk, 0);
             } else {
                 // Streaming terminé
                 this.finishStreaming(messageElement, content);
@@ -375,7 +388,7 @@ class SymplissimeAIApp {
         };
 
         // Démarrer le streaming
-        streamNextChar();
+        streamNextChunk();
     }
 
     createMessageElement(content, isUser = false, isError = false) {
