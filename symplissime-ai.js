@@ -12,6 +12,7 @@ class SymplissimeAIApp {
         this.currentStreamingMessage = null;
         this.streamingInterval = null;
         this.currentTheme = 'symplissime';
+        this.uploadApiUrl = 'http://storage.symplissime.fr:3003/api/v1/document/upload';
         
         this.themes = {
             'symplissime': { 
@@ -342,43 +343,41 @@ class SymplissimeAIApp {
         }
     }
 
-    handleFileUpload(e) {
+    async handleFileUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        this.updateStatus('processing', 'Analyse du fichier', 0);
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('workspace', this.config.WORKSPACE);
+        formData.append('user', this.config.USER);
 
-        reader.addEventListener('progress', (evt) => {
-            if (evt.lengthComputable) {
-                const percent = Math.round((evt.loaded / evt.total) * 100);
-                this.updateStatus('processing', 'Analyse du fichier', percent);
-            }
-        });
+        this.updateStatus('processing', 'Upload du fichier', 0);
 
-        reader.onload = () => {
-            if (file.type.startsWith('text') || /\.(log|txt|json)$/i.test(file.name)) {
-                const analysis = this.analyzeTextFile(reader.result, file);
-                this.addMessage(analysis, false);
-            } else {
-                const info = `📄 Fichier ${file.name} (${this.formatFileSize(file.size)}) reçu. Analyse non supportée.`;
-                this.addMessage(info, false);
+        try {
+            const response = await fetch(this.uploadApiUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
             }
-            this.updateStatus('done', 'Analyse terminée', 100);
+
+            const data = await response.json().catch(() => ({}));
+            const docId = data.documentId || data.id || '';
+            const info = docId
+                ? `📄 Fichier ${file.name} téléchargé (ID: ${docId})`
+                : `📄 Fichier ${file.name} téléchargé`;
+            this.addMessage(info, false);
+            this.updateStatus('done', 'Upload terminé', 100);
+        } catch (err) {
+            console.error('Erreur upload:', err);
+            this.addMessage("Erreur lors de l'upload du fichier", false, true);
+            this.updateStatus('error', 'Erreur upload fichier');
+        } finally {
             setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
             e.target.value = '';
-        };
-
-        reader.onerror = () => {
-            this.addMessage('Erreur lors de la lecture du fichier', false, true);
-            this.updateStatus('error', 'Erreur lecture fichier');
-            e.target.value = '';
-        };
-
-        if (file.type.startsWith('text') || /\.(log|txt|json)$/i.test(file.name)) {
-            reader.readAsText(file);
-        } else {
-            reader.readAsArrayBuffer(file);
         }
     }
 
