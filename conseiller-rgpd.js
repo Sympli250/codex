@@ -1,7 +1,7 @@
 /**
  * Conseiller RGPD IA - Application JavaScript
  * Powered by Symplissime AI
- * Version 3.0
+ * Version 3.1
  */
 
 class ConseillerRGPDApp {
@@ -39,6 +39,15 @@ class ConseillerRGPDApp {
         if (savedFontScale) {
             this.fontScale = parseFloat(savedFontScale);
             document.documentElement.style.setProperty('--font-scale', this.fontScale);
+        }
+
+        const savedTheme = localStorage.getItem('rgpd_theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.textContent = '☀️';
+            }
         }
     }
 
@@ -450,8 +459,13 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     }
 
     toggleTheme() {
-        // Pour l'instant, on garde le thème sombre optimisé pour RGPD
-        this.showToast('Thème sombre optimisé pour RGPD', 'success');
+        const isLight = document.body.classList.toggle('light-mode');
+        localStorage.setItem('rgpd_theme', isLight ? 'light' : 'dark');
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.textContent = isLight ? '☀️' : '🌙';
+        }
+        this.showToast(isLight ? 'Thème clair activé' : 'Thème sombre activé', 'success');
     }
 
     // Méthode pour exporter tout l'historique

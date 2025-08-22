@@ -1,4 +1,4 @@
-/* Conseiller RGPD IA - Styles CSS v3.0 */
+/* Conseiller RGPD IA - Styles CSS v3.1 */
 * {
     margin: 0;
     padding: 0;
@@ -30,6 +30,16 @@
     
     /* Font sizes */
     --font-scale: 1;
+}
+
+body.light-mode {
+    --bg-dark: #f8fafc;
+    --bg-dark-secondary: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border: #cbd5e1;
+    --glass: rgba(0, 0, 0, 0.05);
+    --glass-border: rgba(0, 0, 0, 0.1);
 }
 
 body {

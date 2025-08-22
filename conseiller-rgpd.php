@@ -6,7 +6,7 @@ $BASE_URL = 'http://storage.symplissime.fr:3002';
 $API_KEY = 'DV90GFR-8YR4RW2-G9BMCQ9-9X96PW5';
 $DEFAULT_WORKSPACE = 'expert-rgpd';
 $CURRENT_USER = 'Consultant';
-$APP_VERSION = '3.0';
+$APP_VERSION = '3.1';
 
 // Set timezone to UTC
 date_default_timezone_set('UTC');
