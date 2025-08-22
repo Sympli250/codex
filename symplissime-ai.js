@@ -355,9 +355,16 @@ class SymplissimeAIApp {
         this.updateStatus('processing', 'Upload du fichier', 0);
 
         try {
+            // Include API key if provided to avoid unauthorized errors
+            const headers = {};
+            if (this.config.API_KEY) {
+                headers['Authorization'] = `Bearer ${this.config.API_KEY}`;
+            }
+
             const response = await fetch(this.uploadApiUrl, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers
             });
 
             if (!response.ok) {
