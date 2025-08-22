@@ -8,7 +8,12 @@
 // Configuration de Marked pour la coloration syntaxique
 if (typeof marked !== 'undefined') {
     marked.setOptions({
-        highlight: (code, lang) => hljs.highlightAuto(code).value
+        highlight: (code, lang) => {
+            if (lang && hljs.getLanguage(lang)) {
+                return hljs.highlight(code, {language: lang}).value;
+            }
+            return hljs.highlightAuto(code).value;
+        }
     });
 }
 
