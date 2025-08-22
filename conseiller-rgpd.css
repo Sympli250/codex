@@ -677,6 +677,23 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .controls-panel {
+        right: 10px;
+        bottom: 70px;
+    }
+
+    .chat-messages {
+        padding: 15px;
+    }
+}
+
 /* États de chargement */
 .loading {
     position: relative;

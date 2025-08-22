@@ -230,7 +230,6 @@ class ConseillerRGPDApp {
 
         // Sécurisation et rendu du contenu
         if (!isUser && !isError) {
-            const html = DOMPurify.sanitize(marked.parse(content));
             let html;
             try {
                 html = DOMPurify.sanitize(marked.parse(content));
