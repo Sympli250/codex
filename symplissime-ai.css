@@ -487,14 +487,39 @@ body {
   animation: pulse 2s infinite;
 }
 
+.status-dot.processing {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--c-pri-light);
+  border-top-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  animation: spin 1s linear infinite;
+}
+
 .status-dot.error {
   background: #ef4444;
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+  animation: none;
+}
+
+.status-dot.done {
+  background: var(--c-pri-light);
+  box-shadow: none;
+  animation: none;
+}
+
+#statusProgress {
+  font-size: calc(13px * var(--font-scale));
 }
 
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .powered-by {
@@ -772,6 +797,23 @@ body {
   transform: none;
 }
 
+.file-button {
+  padding: 12px;
+  background: var(--fluent-background-component);
+  border: 1px solid var(--fluent-border-color-light);
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.3s ease;
+}
+
+.file-button:hover {
+  background: var(--fluent-hover-background);
+}
+
 /* TOAST */
 .toast {
   position: fixed;
@@ -894,81 +936,3 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Mini carousel suggestions */
-.carousel-container {
-  margin-top: 8px;
-}
-
-.carousel-items {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.carousel-items::-webkit-scrollbar {
-  display: none;
-}
-
-.carousel-items {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.carousel-card {
-  flex: 0 0 auto;
-  width: 160px;
-  background: var(--fluent-background-component);
-  border: 1px solid var(--fluent-border-color-light);
-  border-radius: 12px;
-  box-shadow: var(--fluent-shadow-sm);
-  overflow: hidden;
-  scroll-snap-align: start;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.carousel-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--fluent-shadow);
-}
-
-.carousel-card img {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-}
-
-.card-text {
-  padding: 8px;
-}
-
-.card-text h3 {
-  margin: 0 0 4px;
-  font-weight: 600;
-  color: var(--c-pri-dark);
-  font-size: 0.9rem;
-}
-
-.card-text p {
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--fluent-text-color);
-  line-height: 1.3;
-}
-
-@media (max-width: 400px) {
-  .carousel-card {
-    width: 140px;
-  }
-  .carousel-card img {
-    height: 90px;
-  }
-}
-
-.carousel-question {
-  margin-bottom: 8px;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
