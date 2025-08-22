@@ -58,6 +58,7 @@ class SymplissimeAIApp {
         this.loadPromptSuggestions();
         this.bindEvents();
         this.updateDateTime();
+        this.updateStatus('connected', 'Connecté');
         this.showWelcomeMessage();
         this.focusInput();
         this.createThemeSelector();
@@ -236,6 +237,13 @@ class SymplissimeAIApp {
             chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
 
+        const fileButton = document.getElementById('fileButton');
+        const fileInput = document.getElementById('fileInput');
+        if (fileButton && fileInput) {
+            fileButton.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        }
+
         // Raccourcis clavier
         document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
 
@@ -289,7 +297,6 @@ class SymplissimeAIApp {
     }
 
     async sendMessage(message) {
-        const includeCarousel = message.toLowerCase().includes('portable');
         this.addMessage(message, true);
         this.showTyping();
         this.setProcessingState(true);
@@ -315,28 +322,90 @@ class SymplissimeAIApp {
             
             if (data.error) {
                 this.addMessage(`Erreur : ${data.error}`, false, true);
-                this.updateStatus(false, 'Erreur');
+                this.updateStatus('error', 'Erreur');
                 this.showToast('Erreur lors de la communication', 'error');
             } else if (data.success && data.message) {
                 // Utiliser l'effet de streaming pour afficher la réponse
                 await this.streamMessage(data.message);
-                if (includeCarousel) {
-                    this.insertCarousel(true);
-                }
-                this.updateStatus(true, 'Connecté');
             } else {
                 this.addMessage('Aucune réponse reçue du serveur', false, true);
-                this.updateStatus(false, 'Pas de réponse');
+                this.updateStatus('error', 'Pas de réponse');
             }
         } catch (error) {
             console.error('Erreur de communication:', error);
             this.hideTyping();
             this.addMessage(`Erreur de connexion : ${error.message}`, false, true);
-            this.updateStatus(false, 'Erreur connexion');
+            this.updateStatus('error', 'Erreur connexion');
             this.showToast('Problème de connexion', 'error');
         } finally {
             this.setProcessingState(false);
         }
+    }
+
+    handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        this.updateStatus('processing', 'Analyse du fichier', 0);
+
+        reader.addEventListener('progress', (evt) => {
+            if (evt.lengthComputable) {
+                const percent = Math.round((evt.loaded / evt.total) * 100);
+                this.updateStatus('processing', 'Analyse du fichier', percent);
+            }
+        });
+
+        reader.onload = () => {
+            if (file.type.startsWith('text') || /\.(log|txt|json)$/i.test(file.name)) {
+                const analysis = this.analyzeTextFile(reader.result, file);
+                this.addMessage(analysis, false);
+            } else {
+                const info = `📄 Fichier ${file.name} (${this.formatFileSize(file.size)}) reçu. Analyse non supportée.`;
+                this.addMessage(info, false);
+            }
+            this.updateStatus('done', 'Analyse terminée', 100);
+            setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
+            e.target.value = '';
+        };
+
+        reader.onerror = () => {
+            this.addMessage('Erreur lors de la lecture du fichier', false, true);
+            this.updateStatus('error', 'Erreur lecture fichier');
+            e.target.value = '';
+        };
+
+        if (file.type.startsWith('text') || /\.(log|txt|json)$/i.test(file.name)) {
+            reader.readAsText(file);
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
+    }
+
+    analyzeTextFile(content, file) {
+        const lines = content.split(/\r?\n/);
+        const errors = lines.filter(l => /error/i.test(l)).length;
+        const warnings = lines.filter(l => /warn/i.test(l)).length;
+        let severity = 'Faible';
+        if (errors > 0) severity = 'Élevée';
+        else if (warnings > 0) severity = 'Moyenne';
+        const actions = errors > 0
+            ? 'Corriger les erreurs détectées'
+            : warnings > 0
+                ? 'Vérifier les avertissements'
+                : 'Aucune action critique';
+        return `📄 Analyse de ${file.name}\n• Taille : ${this.formatFileSize(file.size)}\n• Lignes : ${lines.length}\n• Erreurs : ${errors}\n• Avertissements : ${warnings}\n• Gravité : ${severity}\n• Actions : ${actions}`;
+    }
+
+    formatFileSize(bytes) {
+        const units = ['octets', 'Ko', 'Mo', 'Go'];
+        let size = bytes;
+        let unitIndex = 0;
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        return `${size.toFixed(1)} ${units[unitIndex]}`;
     }
 
     async streamMessage(content) {
@@ -356,6 +425,8 @@ class SymplissimeAIApp {
                 messageContentDiv.innerHTML = html.slice(0, currentIndex + 1);
                 this.scrollToBottom();
                 currentIndex++;
+                const progress = Math.round((currentIndex / totalChars) * 100);
+                this.updateStatus('processing', 'Réponse en cours', progress);
                 // Vitesse de streaming rapide par caractère
                 this.streamingInterval = setTimeout(streamNextChar, 5);
             } else {
@@ -430,6 +501,8 @@ class SymplissimeAIApp {
         }
 
         this.scrollToBottom();
+        this.updateStatus('done', 'Terminé', 100);
+        setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
     }
 
     setProcessingState(processing) {
@@ -450,7 +523,9 @@ class SymplissimeAIApp {
             }
         }
         
-        this.updateStatus(processing ? null : true, processing ? 'Traitement...' : 'Connecté');
+        if (processing) {
+            this.updateStatus('processing', 'Analyse en cours');
+        }
     }
 
     addMessage(content, isUser = false, isError = false) {
@@ -551,71 +626,8 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
         setTimeout(async () => {
             await this.streamMessage(welcomeMessage);
-            this.insertCarousel(true, true);
-            this.updateStatus(true, 'Connecté');
         }, 1000);
     }
-    insertCarousel(withQuestion = false, appendToLast = false) {
-        const carouselHTML = `
-        <div class="carousel-container" role="region" aria-label="Mini carousel d'ordinateurs portables">
-            <div class="carousel-items">
-                <div class="carousel-card" role="listitem">
-                    <img loading="lazy" src="https://images.pexels.com/photos/40185/mac-freelancer-macintosh-macbook-40185.jpeg?auto=compress&cs=tinysrgb&h=150" alt="Ordinateur Portable 1">
-                    <div class="card-text">
-                        <h3>Portable Élégant</h3>
-                        <p>Design moderne pour pros.</p>
-                    </div>
-                </div>
-                <div class="carousel-card" role="listitem">
-                    <img loading="lazy" src="https://placehold.co/240x150/d97706/ffffff?text=Laptop+2" alt="Ordinateur Portable 2">
-                    <div class="card-text">
-                        <h3>Laptop Performant</h3>
-                        <p>Pour gaming et vidéo.</p>
-                    </div>
-                </div>
-                <div class="carousel-card" role="listitem">
-                    <img loading="lazy" src="https://placehold.co/240x150/059669/ffffff?text=Laptop+3" alt="Ordinateur Portable 3">
-                    <div class="card-text">
-                        <h3>Ultrabook Léger</h3>
-                        <p>Parfaitement portable.</p>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
-        const content = withQuestion
-            ? `<p class="carousel-question">Avez-vous besoin de matériel ?</p>${carouselHTML}`
-            : carouselHTML;
-
-        if (appendToLast) {
-            const lastMessage = document.querySelector('#chatMessages .message-wrapper:last-child .message');
-            if (lastMessage) {
-                lastMessage.innerHTML += DOMPurify.sanitize(content);
-                this.initCarousel(lastMessage.querySelector('.carousel-container'));
-                return;
-            }
-        }
-
-        const wrapper = this.createMessageElement('', false, false);
-        const messageDiv = wrapper.querySelector('.message');
-        messageDiv.innerHTML = DOMPurify.sanitize(content);
-
-        this.initCarousel(wrapper.querySelector('.carousel-container'));
-    }
-
-    initCarousel(container) {
-        if (!container) return;
-        const scroller = container.querySelector('.carousel-items');
-        if (!scroller) return;
-
-        container.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                e.preventDefault();
-                scroller.scrollLeft += e.deltaY;
-            }
-        }, { passive: false });
-    }
-
     updateDateTime() {
         const datetimeElement = document.getElementById('datetime');
         if (!datetimeElement) return;
@@ -631,22 +643,35 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
         datetimeElement.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
-    updateStatus(connected, text = null) {
+    updateStatus(state, message = null, progress = null) {
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
-        
-        if (!statusDot || !statusText) return;
+        const statusProgress = document.getElementById('statusProgress');
 
-        if (connected === true) {
-            statusDot.classList.remove('error');
-            statusText.textContent = text || 'Connecté';
-        } else if (connected === false) {
-            statusDot.classList.add('error');
-            statusText.textContent = text || 'Erreur';
-        } else {
-            // État neutre (en cours de traitement)
-            statusText.textContent = text || 'En cours...';
+        if (!statusDot || !statusText || !statusProgress) return;
+
+        statusDot.className = 'status-dot';
+        switch (state) {
+            case 'connected':
+                statusText.textContent = message || 'Connecté';
+                break;
+            case 'processing':
+                statusDot.classList.add('processing');
+                statusText.textContent = message || 'Analyse en cours';
+                break;
+            case 'error':
+                statusDot.classList.add('error');
+                statusText.textContent = message || 'Erreur';
+                break;
+            case 'done':
+                statusDot.classList.add('done');
+                statusText.textContent = message || 'Terminé';
+                break;
+            default:
+                statusText.textContent = message || '';
         }
+
+        statusProgress.textContent = progress != null ? ` ${progress}%` : '';
     }
 
     scrollToBottom() {
