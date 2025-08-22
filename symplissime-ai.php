@@ -175,7 +175,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         window.SYMPLISSIME_CONFIG = {
             WORKSPACE: '<?php echo $DEFAULT_WORKSPACE; ?>',
             USER: '<?php echo htmlspecialchars($CURRENT_USER); ?>',
-            API_ENDPOINT: '<?php echo $_SERVER['PHP_SELF']; ?>'
+            API_ENDPOINT: '<?php echo $_SERVER['PHP_SELF']; ?>',
+            API_KEY: '<?php echo $API_KEY; ?>'
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
