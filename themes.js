@@ -24,13 +24,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#0369a1',
       '--primary-light': '#38bdf8',
       '--secondary': '#0ea5e9',
-      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #0e7490 100%)',
-      '--bg-dark-secondary': '#0f172a',
+      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #082f49 50%, #0e7490 100%)',
+      '--bg-dark-secondary': '#082f49',
       '--text-primary': '#e0f2fe',
-      '--text-secondary': '#a5f3fc',
-      '--border': '#164e63',
+      '--text-secondary': '#bae6fd',
+      '--border': '#075985',
       '--glass': 'rgba(2, 132, 199, 0.15)',
-      '--glass-border': 'rgba(2, 132, 199, 0.3)'
+      '--glass-border': 'rgba(2, 132, 199, 0.4)'
     }
   },
   {
@@ -41,13 +41,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#166534',
       '--primary-light': '#4ade80',
       '--secondary': '#065f46',
-      '--bg-dark': 'linear-gradient(135deg, #052e16 0%, #14532d 100%)',
-      '--bg-dark-secondary': '#052e16',
+      '--bg-dark': 'linear-gradient(135deg, #052e16 0%, #166534 50%, #14532d 100%)',
+      '--bg-dark-secondary': '#0a3522',
       '--text-primary': '#dcfce7',
-      '--text-secondary': '#a7f3d0',
-      '--border': '#064e3b',
+      '--text-secondary': '#bbf7d0',
+      '--border': '#14532d',
       '--glass': 'rgba(22, 163, 74, 0.15)',
-      '--glass-border': 'rgba(22, 163, 74, 0.3)'
+      '--glass-border': 'rgba(22, 163, 74, 0.4)'
     }
   },
   {
@@ -58,30 +58,30 @@ window.RGPD_THEMES = [
       '--primary-dark': '#9f1239',
       '--primary-light': '#f472b6',
       '--secondary': '#c2410c',
-      '--bg-dark': 'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)',
-      '--bg-dark-secondary': '#4c0519',
+      '--bg-dark': 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #c2410c 100%)',
+      '--bg-dark-secondary': '#5f071f',
       '--text-primary': '#fee2e2',
-      '--text-secondary': '#fecdd3',
-      '--border': '#7f1d1d',
+      '--text-secondary': '#fda4af',
+      '--border': '#9f1239',
       '--glass': 'rgba(190, 18, 60, 0.15)',
-      '--glass-border': 'rgba(190, 18, 60, 0.3)'
+      '--glass-border': 'rgba(190, 18, 60, 0.4)'
     }
   },
   {
     id: 'glass',
     name: 'Glass',
     vars: {
-      '--primary': 'rgba(255, 255, 255, 0.8)',
-      '--primary-dark': 'rgba(255, 255, 255, 0.6)',
+      '--primary': 'rgba(255, 255, 255, 0.9)',
+      '--primary-dark': 'rgba(255, 255, 255, 0.7)',
       '--primary-light': '#ffffff',
-      '--secondary': 'rgba(255, 255, 255, 0.3)',
-      '--bg-dark': 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%)',
-      '--bg-dark-secondary': 'rgba(255,255,255,0.1)',
-      '--text-primary': '#ffffff',
-      '--text-secondary': '#e2e8f0',
-      '--border': 'rgba(255,255,255,0.2)',
-      '--glass': 'rgba(255,255,255,0.2)',
-      '--glass-border': 'rgba(255,255,255,0.3)'
+      '--secondary': 'rgba(255, 255, 255, 0.5)',
+      '--bg-dark': 'rgba(255, 255, 255, 0.5)',
+      '--bg-dark-secondary': 'rgba(255, 255, 255, 0.3)',
+      '--text-primary': '#0f172a',
+      '--text-secondary': '#334155',
+      '--border': 'rgba(0, 0, 0, 0.2)',
+      '--glass': 'rgba(255, 255, 255, 0.4)',
+      '--glass-border': 'rgba(0, 0, 0, 0.2)'
     }
   },
   {
@@ -92,13 +92,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#7e22ce',
       '--primary-light': '#d946ef',
       '--secondary': '#06b6d4',
-      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #9333ea 50%, #db2777 100%)',
+      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #9333ea 40%, #db2777 80%, #06b6d4 100%)',
       '--bg-dark-secondary': '#1e1b4b',
       '--text-primary': '#f3e8ff',
-      '--text-secondary': '#e9d5ff',
-      '--border': '#6b21a8',
+      '--text-secondary': '#f5d0fe',
+      '--border': '#7e22ce',
       '--glass': 'rgba(147, 51, 234, 0.15)',
-      '--glass-border': 'rgba(147, 51, 234, 0.3)'
+      '--glass-border': 'rgba(147, 51, 234, 0.4)'
     }
   },
   {
@@ -109,13 +109,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#d97706',
       '--primary-light': '#fde68a',
       '--secondary': '#10b981',
-      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #f59e0b 25%, #10b981 50%, #3b82f6 75%, #db2777 100%)',
+      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #f59e0b 20%, #10b981 40%, #3b82f6 60%, #db2777 80%, #8b5cf6 100%)',
       '--bg-dark-secondary': '#0f172a',
       '--text-primary': '#fef3c7',
       '--text-secondary': '#fde68a',
-      '--border': '#92400e',
+      '--border': '#b45309',
       '--glass': 'rgba(245, 158, 11, 0.15)',
-      '--glass-border': 'rgba(245, 158, 11, 0.3)'
+      '--glass-border': 'rgba(245, 158, 11, 0.4)'
     }
   },
   {
@@ -126,13 +126,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#0d9488',
       '--primary-light': '#5eead4',
       '--secondary': '#f472b6',
-      '--bg-dark': 'linear-gradient(135deg, #18181b 0%, #0d9488 50%, #f472b6 100%)',
+      '--bg-dark': 'linear-gradient(135deg, #18181b 0%, #0d9488 40%, #f472b6 80%, #2dd4bf 100%)',
       '--bg-dark-secondary': '#18181b',
       '--text-primary': '#ccfbf1',
-      '--text-secondary': '#99f6e4',
-      '--border': '#0f766e',
+      '--text-secondary': '#a7ffeb',
+      '--border': '#0d9488',
       '--glass': 'rgba(20, 184, 166, 0.15)',
-      '--glass-border': 'rgba(20, 184, 166, 0.3)'
+      '--glass-border': 'rgba(20, 184, 166, 0.4)'
     }
   },
   {
@@ -143,13 +143,13 @@ window.RGPD_THEMES = [
       '--primary-dark': '#4f46e5',
       '--primary-light': '#a5b4fc',
       '--secondary': '#ec4899',
-      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #4f46e5 50%, #ec4899 100%)',
+      '--bg-dark': 'linear-gradient(135deg, #0f172a 0%, #4f46e5 40%, #ec4899 80%, #6366f1 100%)',
       '--bg-dark-secondary': '#1e1b4b',
       '--text-primary': '#ede9fe',
-      '--text-secondary': '#ddd6fe',
-      '--border': '#4338ca',
+      '--text-secondary': '#e0e7ff',
+      '--border': '#4f46e5',
       '--glass': 'rgba(99, 102, 241, 0.15)',
-      '--glass-border': 'rgba(99, 102, 241, 0.3)'
+      '--glass-border': 'rgba(99, 102, 241, 0.4)'
     }
   }
 ];

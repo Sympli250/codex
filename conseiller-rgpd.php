@@ -181,7 +181,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     </div>
     
     <div class="toast" id="toast"></div>
-    <div class="debug-panel hidden" id="debugPanel"></div>
+    <div class="debug-panel hidden" id="debugPanel">
+        <div class="debug-header">
+            <span>Debug</span>
+            <button class="debug-close" id="debugClose">&times;</button>
+        </div>
+        <div class="debug-info" id="debugInfo"></div>
+        <div class="debug-content" id="debugContent"></div>
+    </div>
 
     <!-- Configuration JavaScript -->
     <script>
