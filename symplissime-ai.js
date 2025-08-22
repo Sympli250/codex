@@ -15,7 +15,6 @@ class SymplissimeAIApp {
         this.currentStreamingMessage = null;
         this.streamingInterval = null;
         this.currentTheme = 'symplissime';
-        this.uploadApiUrl = 'http://storage.symplissime.fr:3003/api/v1/document/upload';
         
         this.themes = {
             'symplissime': { 
@@ -241,12 +240,13 @@ class SymplissimeAIApp {
             chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
 
-        const fileButton = document.getElementById('fileButton');
-        const fileInput = document.getElementById('fileInput');
-        if (fileButton && fileInput) {
-            fileButton.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-        }
+        // Animations des boutons
+        document.querySelectorAll('.control-btn, .send-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.add('bounce');
+                btn.addEventListener('animationend', () => btn.classList.remove('bounce'), { once: true });
+            });
+        });
 
         // Raccourcis clavier
         document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
@@ -346,97 +346,6 @@ class SymplissimeAIApp {
         }
     }
 
-    async handleFileUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (!this.config.API_KEY) {
-            // Éviter les appels inutiles si la clé API n'est pas configurée
-            this.addMessage('Clé API requise pour l\'upload de fichiers.', false, true);
-            this.updateStatus('error', 'Clé API manquante');
-            e.target.value = '';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('document', file);
-        formData.append('workspace', this.config.WORKSPACE);
-        formData.append('user', this.config.USER);
-        formData.append('apiKey', this.config.API_KEY);
-
-        this.updateStatus('processing', 'Upload du fichier', 0);
-
-        try {
-            // Inclure la clé API dans l'en-tête pour l'authentification côté serveur
-            const headers = {
-                'Authorization': `Bearer ${this.config.API_KEY}`
-            };
-
-            const response = await fetch(this.uploadApiUrl, {
-                method: 'POST',
-                body: formData,
-                headers
-            });
-
-            const responseBody = await response.text();
-            console.log('Upload response body:', responseBody);
-
-            if (response.status === 403) {
-                this.addMessage('Accès refusé : clé API manquante ou invalide.', false, true);
-                this.updateStatus('error', 'Clé API invalide');
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status}`);
-            }
-
-            let data = {};
-            try {
-                data = JSON.parse(responseBody);
-            } catch (e) {}
-            const docId = data.documentId || data.id || '';
-            const info = docId
-                ? `📄 Fichier ${file.name} téléchargé (ID: ${docId})`
-                : `📄 Fichier ${file.name} téléchargé`;
-            this.addMessage(info, false);
-            this.updateStatus('done', 'Upload terminé', 100);
-        } catch (err) {
-            console.error('Erreur upload:', err);
-            this.addMessage("Erreur lors de l'upload du fichier", false, true);
-            this.updateStatus('error', 'Erreur upload fichier');
-        } finally {
-            setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
-            e.target.value = '';
-        }
-    }
-
-    analyzeTextFile(content, file) {
-        const lines = content.split(/\r?\n/);
-        const errors = lines.filter(l => /error/i.test(l)).length;
-        const warnings = lines.filter(l => /warn/i.test(l)).length;
-        let severity = 'Faible';
-        if (errors > 0) severity = 'Élevée';
-        else if (warnings > 0) severity = 'Moyenne';
-        const actions = errors > 0
-            ? 'Corriger les erreurs détectées'
-            : warnings > 0
-                ? 'Vérifier les avertissements'
-                : 'Aucune action critique';
-        return `📄 Analyse de ${file.name}\n• Taille : ${this.formatFileSize(file.size)}\n• Lignes : ${lines.length}\n• Erreurs : ${errors}\n• Avertissements : ${warnings}\n• Gravité : ${severity}\n• Actions : ${actions}`;
-    }
-
-    formatFileSize(bytes) {
-        const units = ['octets', 'Ko', 'Mo', 'Go'];
-        let size = bytes;
-        let unitIndex = 0;
-        while (size >= 1024 && unitIndex < units.length - 1) {
-            size /= 1024;
-            unitIndex++;
-        }
-        return `${size.toFixed(1)} ${units[unitIndex]}`;
-    }
-
     async streamMessage(content) {
         // Créer la structure du message
         const messageElement = this.createMessageElement('', false, false);
@@ -473,7 +382,7 @@ class SymplissimeAIApp {
         if (!chatMessages) return null;
 
         const wrapper = document.createElement('div');
-        wrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
+        wrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'} fade-in`;
         
         const avatar = document.createElement('div');
         avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
@@ -855,10 +764,13 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
             
             const chatMessages = document.getElementById('chatMessages');
             if (chatMessages) {
-                chatMessages.innerHTML = '';
+                chatMessages.querySelectorAll('.message-wrapper').forEach(msg => msg.classList.add('fade-out'));
+                setTimeout(() => {
+                    chatMessages.innerHTML = '';
+                    this.showWelcomeMessage();
+                }, 300);
             }
             this.messageHistory = [];
-            this.showWelcomeMessage();
             this.showToast('Historique effacé', 'success');
         }
     }

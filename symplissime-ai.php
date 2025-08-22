@@ -158,8 +158,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                         maxlength="1000"
                     >
                     <datalist id="promptSuggestions"></datalist>
-                    <input type="file" id="fileInput" style="display:none" />
-                    <button type="button" class="file-button" id="fileButton" title="Analyser un fichier">📎</button>
                     <button type="submit" class="send-button" id="sendButton">
                         <span>Envoyer</span>
                     </button>
