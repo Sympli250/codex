@@ -42,6 +42,28 @@ body.light-mode {
     --glass-border: rgba(0, 0, 0, 0.1);
 }
 
+/* Color themes */
+body.theme-ocean {
+    --primary: #0284c7;
+    --primary-dark: #0369a1;
+    --primary-light: #38bdf8;
+    --secondary: #0ea5e9;
+}
+
+body.theme-forest {
+    --primary: #16a34a;
+    --primary-dark: #166534;
+    --primary-light: #4ade80;
+    --secondary: #065f46;
+}
+
+body.theme-sunset {
+    --primary: #be123c;
+    --primary-dark: #9f1239;
+    --primary-light: #f472b6;
+    --secondary: #c2410c;
+}
+
 body {
     font-family: var(--font-sans);
     background: var(--bg-dark);

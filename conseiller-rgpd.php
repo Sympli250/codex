@@ -13,7 +13,6 @@ date_default_timezone_set('UTC');
 
 // Handle chat requests
 if (isset($_POST['action']) && $_POST['action'] === 'chat') {
-    header('Content-Type: application/json');
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: POST');
     header('Access-Control-Allow-Headers: Content-Type');
@@ -26,7 +25,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     
     // Validation des données
     if (empty($message)) {
-        echo json_encode(['error' => 'Message vide']);
+        http_response_code(400);
+        echo 'Message vide';
         exit;
     }
     
@@ -57,31 +57,43 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     curl_close($ch);
     
     if ($error) {
-        echo json_encode(['error' => 'Erreur de connexion: ' . $error]);
+        http_response_code(500);
+        echo 'Erreur de connexion: ' . $error;
         exit;
     }
-    
+
     if ($httpCode !== 200) {
-        echo json_encode(['error' => "Erreur serveur: HTTP $httpCode"]);
+        http_response_code($httpCode);
+        echo "Erreur serveur: HTTP $httpCode";
         exit;
     }
     
     $responseData = json_decode($response, true);
     
     if ($responseData && json_last_error() === JSON_ERROR_NONE) {
-        $assistantMessage = 
-            $responseData['textResponse'] ?? 
-            $responseData['response'] ?? 
-            $responseData['message'] ?? 
+        $assistantMessage =
+            $responseData['textResponse'] ??
+            $responseData['response'] ??
+            $responseData['message'] ??
             'Aucune réponse reçue';
-        
-        echo json_encode([
-            'success' => true,
-            'message' => $assistantMessage,
-            'sessionId' => $sessionId
-        ]);
+
+        header('Content-Type: text/plain; charset=UTF-8');
+        header('Cache-Control: no-cache');
+        header('X-Accel-Buffering: no');
+        @ob_end_clean();
+        $length = mb_strlen($assistantMessage, 'UTF-8');
+        for ($i = 0; $i < $length; $i++) {
+            echo mb_substr($assistantMessage, $i, 1, 'UTF-8');
+            if ($i % 20 === 0) {
+                echo "\n";
+            }
+            @ob_flush();
+            flush();
+            usleep(10000);
+        }
     } else {
-        echo json_encode(['error' => 'Format de réponse invalide']);
+        http_response_code(500);
+        echo 'Format de réponse invalide';
     }
     exit;
 }
@@ -110,6 +122,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         <button class="control-btn" onclick="rgpdApp.decreaseFontSize()" title="Réduire le texte">A-</button>
         <button class="control-btn" onclick="rgpdApp.increaseFontSize()" title="Agrandir le texte">A+</button>
         <button class="control-btn" onclick="rgpdApp.toggleTheme()" title="Basculer le thème" id="themeToggle">🌙</button>
+        <button class="control-btn" onclick="rgpdApp.cycleColorTheme()" title="Changer le thème de couleur" id="colorThemeToggle">🎨</button>
     </div>
     
     <div class="main-container">

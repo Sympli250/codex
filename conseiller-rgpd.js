@@ -23,6 +23,8 @@ class ConseillerRGPDApp {
         this.fontScale = 1;
         this.isProcessing = false;
         this.messageHistory = [];
+        this.colorThemes = ['', 'theme-ocean', 'theme-forest', 'theme-sunset'];
+        this.currentColorThemeIndex = 0;
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -61,6 +63,12 @@ class ConseillerRGPDApp {
             if (themeToggle) {
                 themeToggle.textContent = '☀️';
             }
+        }
+
+        const savedColorTheme = localStorage.getItem('rgpd_colorTheme');
+        if (savedColorTheme && this.colorThemes.includes(savedColorTheme)) {
+            document.body.classList.add(savedColorTheme);
+            this.currentColorThemeIndex = this.colorThemes.indexOf(savedColorTheme);
         }
     }
 
@@ -140,42 +148,41 @@ class ConseillerRGPDApp {
         this.addMessage(message, true);
         this.showTyping();
         this.setProcessingState(true);
-        
+
         try {
             const formData = new FormData();
             formData.append('action', 'chat');
             formData.append('message', message);
             formData.append('workspace', this.config.WORKSPACE);
-            
+
             const response = await fetch(this.config.API_ENDPOINT, {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `Erreur HTTP: ${response.status}`);
             }
-            
-            const data = await response.json();
-            
+
             this.hideTyping();
-            
-            if (data.error) {
-                this.addMessage(`Erreur : ${data.error}`, false, true);
-                this.updateStatus(false, 'Erreur');
-                this.showToast('Erreur lors de la communication', 'error');
-            } else if (data.success && data.message) {
-                this.addMessage(data.message, false, false);
-                this.updateStatus(true, 'Connecté');
-            } else {
-                this.addMessage('Aucune réponse reçue du serveur', false, true);
-                this.updateStatus(false, 'Pas de réponse');
+
+            const messageEl = this.addMessage('', false, false);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                this.streamMessage(messageEl, chunk);
             }
+            this.finishStreaming(messageEl);
+            this.updateStatus(true, 'Connecté');
         } catch (error) {
             console.error('Erreur de communication:', error);
             this.hideTyping();
-            this.addMessage(`Erreur de connexion : ${error.message}`, false, true);
-            this.updateStatus(false, 'Erreur connexion');
+            this.addMessage(`Erreur : ${error.message}`, false, true);
+            this.updateStatus(false, 'Erreur');
             this.showToast('Problème de connexion', 'error');
         } finally {
             this.setProcessingState(false);
@@ -265,13 +272,15 @@ class ConseillerRGPDApp {
         
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
-        
+
         this.scrollToBottom();
+        return message;
     }
 
     streamMessage(messageElement, text) {
         if (messageElement) {
             messageElement.textContent += text;
+            this.scrollToBottom();
         }
     }
 
@@ -292,6 +301,16 @@ class ConseillerRGPDApp {
             messageElement.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
             });
+            const messageContent = messageElement.parentElement;
+            if (messageContent) {
+                const oldActions = messageContent.querySelector('.message-actions');
+                if (oldActions) oldActions.remove();
+                const actions = this.createMessageActions(fullText);
+                messageContent.appendChild(actions);
+            }
+            if (this.messageHistory.length > 0) {
+                this.messageHistory[this.messageHistory.length - 1].content = fullText;
+            }
         }
     }
 
@@ -527,6 +546,18 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         this.showToast(isLight ? 'Thème clair activé' : 'Thème sombre activé', 'success');
     }
 
+    cycleColorTheme() {
+        document.body.classList.remove('theme-ocean', 'theme-forest', 'theme-sunset');
+        this.currentColorThemeIndex = (this.currentColorThemeIndex + 1) % this.colorThemes.length;
+        const theme = this.colorThemes[this.currentColorThemeIndex];
+        if (theme) {
+            document.body.classList.add(theme);
+        }
+        localStorage.setItem('rgpd_colorTheme', theme);
+        const themeName = theme ? theme.split('-')[1] : 'par défaut';
+        this.showToast(`Thème ${themeName} activé`, 'success');
+    }
+
     // Méthode pour exporter tout l'historique
     exportChatHistory() {
         if (this.messageHistory.length <= 1) {
@@ -580,6 +611,7 @@ window.rgpdApp = {
     increaseFontSize: () => rgpdApp?.increaseFontSize(),
     decreaseFontSize: () => rgpdApp?.decreaseFontSize(),
     toggleTheme: () => rgpdApp?.toggleTheme(),
+    cycleColorTheme: () => rgpdApp?.cycleColorTheme(),
     exportHistory: () => rgpdApp?.exportChatHistory(),
     clearHistory: () => rgpdApp?.clearHistory()
 };
