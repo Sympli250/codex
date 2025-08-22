@@ -37,6 +37,9 @@ class ConseillerRGPDApp {
         this.themeMenu = document.getElementById('themeMenu');
         this.fontMenu = document.getElementById('fontMenu');
         this.debugPanel = document.getElementById('debugPanel');
+        this.debugContent = document.getElementById('debugContent');
+        this.debugInfo = document.getElementById('debugInfo');
+        this.debugClose = document.getElementById('debugClose');
         
         this.init();
     }
@@ -49,6 +52,8 @@ class ConseillerRGPDApp {
         this.showWelcomeMessage();
         this.focusInput();
         this.updateSendButtonState();
+        this.logAction('Application initialisée');
+        this.updateDebugInfo();
 
         // Mise à jour de l'heure chaque seconde
         setInterval(() => this.updateDateTime(), 1000);
@@ -143,6 +148,10 @@ class ConseillerRGPDApp {
                     this.hideFontMenu();
                 }
             });
+        }
+
+        if (this.debugClose) {
+            this.debugClose.addEventListener('click', () => this.toggleDebug());
         }
 
         // Raccourcis clavier
@@ -642,6 +651,21 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     toggleDebug() {
         if (this.debugPanel) {
             this.debugPanel.classList.toggle('hidden');
+            if (!this.debugPanel.classList.contains('hidden')) {
+                this.updateDebugInfo();
+            }
+        }
+    }
+
+    updateDebugInfo() {
+        if (this.debugInfo) {
+            const info = [
+                `Version: ${this.config.VERSION}`,
+                `Utilisateur: ${this.config.USER}`,
+                `Thème: ${localStorage.getItem('rgpd_colorTheme') || 'default'}`,
+                `Police: ${localStorage.getItem('rgpd_font') || 'default'}`
+            ];
+            this.debugInfo.innerHTML = info.map(i => `<div>${i}</div>`).join('');
         }
     }
 
@@ -649,11 +673,11 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         const timestamp = new Date().toLocaleTimeString();
         const entry = `[${timestamp}] ${action}`;
         this.debugLog.push(entry);
-        if (this.debugPanel) {
+        if (this.debugContent) {
             const div = document.createElement('div');
             div.textContent = entry;
-            this.debugPanel.appendChild(div);
-            this.debugPanel.scrollTop = this.debugPanel.scrollHeight;
+            this.debugContent.appendChild(div);
+            this.debugContent.scrollTop = this.debugContent.scrollHeight;
         }
     }
 
@@ -673,6 +697,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         const fontName = fontMap[font] || 'défaut';
         this.showToast(`Police ${fontName} activée`, 'success');
         this.logAction(`Police changée: ${fontName}`);
+        this.updateDebugInfo();
     }
 
     applyColorTheme(themeId, silent = false) {
@@ -684,6 +709,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
             this.showToast(`Thème ${theme.name} activé`, 'success');
         }
         this.logAction(`Thème changé: ${theme.name}`);
+        this.updateDebugInfo();
     }
 
     // Méthode pour exporter tout l'historique
