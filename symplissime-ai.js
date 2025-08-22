@@ -289,6 +289,7 @@ class SymplissimeAIApp {
     }
 
     async sendMessage(message) {
+        const includeCarousel = message.toLowerCase().includes('portable');
         this.addMessage(message, true);
         this.showTyping();
         this.setProcessingState(true);
@@ -319,6 +320,9 @@ class SymplissimeAIApp {
             } else if (data.success && data.message) {
                 // Utiliser l'effet de streaming pour afficher la réponse
                 await this.streamMessage(data.message);
+                if (includeCarousel) {
+                    this.insertCarousel(true);
+                }
                 this.updateStatus(true, 'Connecté');
             } else {
                 this.addMessage('Aucune réponse reçue du serveur', false, true);
@@ -547,34 +551,32 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
         setTimeout(async () => {
             await this.streamMessage(welcomeMessage);
-            this.insertCarousel();
             this.updateStatus(true, 'Connecté');
         }, 1000);
     }
-
-    insertCarousel() {
+    insertCarousel(withQuestion = false) {
         const carouselHTML = `
         <div class="carousel-container" role="region" aria-label="Mini carousel d'ordinateurs portables">
             <div class="carousel-track" role="list">
                 <div class="carousel-item" role="listitem" aria-label="Slide 1: Elegant Laptop">
-                    <img loading="lazy" src="https://images.pexels.com/photos/40185/mac-freelancer-macintosh-macbook-40185.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=1" alt="Ordinateur Portable 1">
+                    <img loading="lazy" src="https://images.pexels.com/photos/40185/mac-freelancer-macintosh-macbook-40185.jpeg?auto=compress&cs=tinysrgb&h=150" alt="Ordinateur Portable 1">
                     <div class="item-text">
                         <h3>Portable Élégant</h3>
                         <p>Design moderne pour pros.</p>
                     </div>
                 </div>
                 <div class="carousel-item" role="listitem" aria-label="Slide 2: High Performance Laptop">
-                    <img loading="lazy" src="https://placehold.co/600x400/d97706/ffffff?text=Laptop+2" alt="Ordinateur Portable 2">
+                    <img loading="lazy" src="https://placehold.co/240x150/d97706/ffffff?text=Laptop+2" alt="Ordinateur Portable 2">
                     <div class="item-text">
                         <h3>Laptop Performant</h3>
-                        <p>Idéal pour gaming et vidéo.</p>
+                        <p>Pour gaming et vidéo.</p>
                     </div>
                 </div>
                 <div class="carousel-item" role="listitem" aria-label="Slide 3: Lightweight Ultrabook">
-                    <img loading="lazy" src="https://placehold.co/600x400/059669/ffffff?text=Laptop+3" alt="Ordinateur Portable 3">
+                    <img loading="lazy" src="https://placehold.co/240x150/059669/ffffff?text=Laptop+3" alt="Ordinateur Portable 3">
                     <div class="item-text">
                         <h3>Ultrabook Léger</h3>
-                        <p>Parfait pour la portabilité.</p>
+                        <p>Parfaitement portable.</p>
                     </div>
                 </div>
             </div>
@@ -587,9 +589,13 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
             </div>
         </div>`;
 
+        const content = withQuestion
+            ? `<p class="carousel-question">Avez-vous besoin de matériel ?</p>${carouselHTML}`
+            : carouselHTML;
+
         const wrapper = this.createMessageElement('', false, false);
         const messageDiv = wrapper.querySelector('.message');
-        messageDiv.innerHTML = DOMPurify.sanitize(carouselHTML);
+        messageDiv.innerHTML = DOMPurify.sanitize(content);
 
         this.initCarousel(wrapper.querySelector('.carousel-container'));
     }
