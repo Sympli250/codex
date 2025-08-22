@@ -32,7 +32,8 @@
   /* Typography Premium */
   --font-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Consolas', monospace;
-  --font-scale: 1;
+  /* Slightly larger base text for readability */
+  --font-scale: 1.1;
 }
 
 /* Thèmes alternatifs */
@@ -140,6 +141,46 @@
   --fluent-shadow-container: 0 2px 8px rgba(187, 134, 252, 0.14);
 }
 
+[data-theme="forest-theme"] {
+  --c-pri: #16a34a;
+  --c-pri-light: #4ade80;
+  --c-pri-dark: #166534;
+  --c-bg: #fff;
+  --c-bg-hover: #f0fdf4;
+  --c-border: #bbf7d0;
+  --c-shadow: 0 4px 30px #4ade8022, 0 1.5px 6px #16a34a18;
+  --c-table-odd: #f0fdf4;
+  --c-table-even: #dcfce7;
+  --fluent-primary: var(--c-pri);
+  --fluent-text-color: var(--c-pri);
+  --fluent-border-color-light: var(--c-border);
+  --fluent-border-color-accent: var(--c-pri-light);
+  --fluent-background-light: #f0fdf4;
+  --fluent-hover-background: var(--c-bg-hover);
+  --fluent-active-background: #bbf7d0;
+  --fluent-shadow-container: 0 2px 8px rgba(22, 163, 74, 0.14);
+}
+
+[data-theme="neon-theme"] {
+  --c-pri: #2dd4bf;
+  --c-pri-light: #5eead4;
+  --c-pri-dark: #0d9488;
+  --c-bg: #fff;
+  --c-bg-hover: #ecfeff;
+  --c-border: #99f6e4;
+  --c-shadow: 0 4px 30px #5eead422, 0 1.5px 6px #2dd4bf18;
+  --c-table-odd: #f0fdfa;
+  --c-table-even: #ecfeff;
+  --fluent-primary: var(--c-pri);
+  --fluent-text-color: var(--c-pri);
+  --fluent-border-color-light: var(--c-border);
+  --fluent-border-color-accent: var(--c-pri-light);
+  --fluent-background-light: #f0fdfa;
+  --fluent-hover-background: var(--c-bg-hover);
+  --fluent-active-background: #ccfbf1;
+  --fluent-shadow-container: 0 2px 8px rgba(45, 212, 191, 0.14);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -168,6 +209,8 @@ body {
   font-synthesis: none;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  font-size: calc(16px * var(--font-scale));
+  line-height: 1.6;
 }
 
 /* Sélecteur de thème */
@@ -282,6 +325,14 @@ body {
 
 .theme-preview.dark::before {
   background: linear-gradient(135deg, #1e1e1e 0%, #bb86fc 100%);
+}
+
+.theme-preview.forest::before {
+  background: linear-gradient(135deg, #16a34a 0%, #4ade80 100%);
+}
+
+.theme-preview.neon::before {
+  background: linear-gradient(135deg, #0d9488 0%, #5eead4 100%);
 }
 
 /* BRANDING SYMPLISSIME */
@@ -654,6 +705,8 @@ body {
   font-weight: 400;
   position: relative;
   overflow: hidden;
+  /* Limit line length for better readability */
+  max-width: 60ch;
 }
 
 .message.user {
