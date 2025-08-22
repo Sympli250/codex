@@ -97,6 +97,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="symplissime-ai.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
 </head>
 <body>
     <!-- Symplissime Branding -->
@@ -172,7 +173,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
             API_ENDPOINT: '<?php echo $_SERVER['PHP_SELF']; ?>'
         };
     </script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
     <script src="symplissime-ai.js"></script>
 </body>
 </html>

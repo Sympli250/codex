@@ -50,6 +50,10 @@ class SymplissimeAIApp {
     }
 
     init() {
+        if (window.marked) {
+            marked.setOptions({ breaks: true });
+        }
+
         this.loadSavedPreferences();
         this.bindEvents();
         this.updateDateTime();
@@ -380,7 +384,19 @@ class SymplissimeAIApp {
         return wrapper;
     }
 
+    renderMarkdown(element, content) {
+        if (!element) return;
+        const html = DOMPurify.sanitize(marked.parse(content));
+        element.innerHTML = html;
+        element.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
+    }
+
     finishStreaming(messageElement, content) {
+        const messageDiv = messageElement.querySelector('.message');
+        this.renderMarkdown(messageDiv, content);
+
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser: false, isError: false, timestamp: new Date() });
         
@@ -423,16 +439,21 @@ class SymplissimeAIApp {
     addMessage(content, isUser = false, isError = false) {
         // Pour les messages utilisateur et d'erreur, pas de streaming
         const messageElement = this.createMessageElement(content, isUser, isError);
-        
-        // Actions pour les messages du bot (non-erreur) - pas de streaming pour ces cas
+
+        // Actions et rendu Markdown pour les messages du bot (non-erreur)
         if (!isUser && !isError) {
+            const messageDiv = messageElement.querySelector('.message');
+            this.renderMarkdown(messageDiv, content);
+
             const messageContent = messageElement.querySelector('.message-content');
             const actions = this.createMessageActions(content);
             messageContent.appendChild(actions);
         }
-        
+
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
+
+        this.scrollToBottom();
     }
 
     createMessageActions(content) {
