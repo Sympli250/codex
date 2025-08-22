@@ -350,19 +350,27 @@ class SymplissimeAIApp {
         const file = e.target.files[0];
         if (!file) return;
 
+        if (!this.config.API_KEY) {
+            // Éviter les appels inutiles si la clé API n'est pas configurée
+            this.addMessage('Clé API requise pour l\'upload de fichiers.', false, true);
+            this.updateStatus('error', 'Clé API manquante');
+            e.target.value = '';
+            return;
+        }
+
         const formData = new FormData();
         formData.append('document', file);
         formData.append('workspace', this.config.WORKSPACE);
         formData.append('user', this.config.USER);
+        formData.append('apiKey', this.config.API_KEY);
 
         this.updateStatus('processing', 'Upload du fichier', 0);
 
         try {
-            // Include API key if provided to avoid unauthorized errors
-            const headers = {};
-            if (this.config.API_KEY) {
-                headers['Authorization'] = `Bearer ${this.config.API_KEY}`;
-            }
+            // Inclure la clé API dans l'en-tête pour l'authentification côté serveur
+            const headers = {
+                'Authorization': `Bearer ${this.config.API_KEY}`
+            };
 
             const response = await fetch(this.uploadApiUrl, {
                 method: 'POST',
