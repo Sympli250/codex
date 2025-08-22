@@ -151,5 +151,11 @@ window.RGPD_THEMES = [
       '--glass': 'rgba(99, 102, 241, 0.15)',
       '--glass-border': 'rgba(99, 102, 241, 0.4)'
     }
+  },
+  {
+    id: 'symplissime',
+    name: 'Symplissime',
+    class: 'theme-symplissime',
+    vars: {}
   }
 ];

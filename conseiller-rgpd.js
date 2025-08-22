@@ -26,6 +26,7 @@ class ConseillerRGPDApp {
         this.themes = window.RGPD_THEMES || [];
         this.fontClasses = ['font-inter', 'font-roboto', 'font-lato', 'font-poppins', 'font-jetbrains'];
         this.debugLog = [];
+        this.requestStartTime = null;
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -210,6 +211,8 @@ class ConseillerRGPDApp {
         this.addMessage(message, true);
         this.showTyping();
         this.setProcessingState(true);
+        this.requestStartTime = performance.now();
+        this.logAction('Connexion : requête envoyée');
 
         try {
             const formData = new FormData();
@@ -221,6 +224,8 @@ class ConseillerRGPDApp {
                 method: 'POST',
                 body: formData
             });
+
+            this.logAction(`Connexion : réponse reçue (${Math.round(performance.now() - this.requestStartTime)} ms)`);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -239,6 +244,8 @@ class ConseillerRGPDApp {
                 this.streamMessage(messageEl, chunk);
             }
             this.finishStreaming(messageEl);
+            const totalTime = Math.round(performance.now() - this.requestStartTime);
+            this.logAction(`Temps de réponse: ${totalTime} ms`);
             this.updateStatus(true, 'Connecté');
         } catch (error) {
             console.error('Erreur de communication:', error);
@@ -246,8 +253,10 @@ class ConseillerRGPDApp {
             this.addMessage(`Erreur : ${error.message}`, false, true);
             this.updateStatus(false, 'Erreur');
             this.showToast('Problème de connexion', 'error');
+            this.logAction(`Erreur de connexion: ${error.message}`);
         } finally {
             this.setProcessingState(false);
+            this.requestStartTime = null;
         }
     }
 
@@ -335,9 +344,9 @@ class ConseillerRGPDApp {
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
         if (isUser) {
-            this.logAction(`Utilisateur: ${content}`);
+            this.logAction('Message utilisateur envoyé');
         } else if (isError) {
-            this.logAction(`Erreur: ${content}`);
+            this.logAction(`Erreur affichée: ${content}`);
         }
 
         this.scrollToBottom();
@@ -359,8 +368,10 @@ class ConseillerRGPDApp {
                 html = marked.parse(fullText);
                 html = DOMPurify.sanitize(html);
                 html = typogr.typogrify(html);
+                this.logAction('Formatage appliqué');
             } catch (e) {
                 html = DOMPurify.sanitize('<div class="error-message">Erreur lors de l\'affichage du message.</div>');
+                this.logAction('Erreur de formatage');
                 // Optionally, log the error for debugging:
                 // console.error('Markdown parsing error:', e);
             }
@@ -378,7 +389,7 @@ class ConseillerRGPDApp {
             if (this.messageHistory.length > 0) {
                 this.messageHistory[this.messageHistory.length - 1].content = fullText;
             }
-            this.logAction(`Bot: ${fullText}`);
+            this.logAction('Réponse bot terminée');
         }
     }
 
@@ -460,7 +471,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
 
         setTimeout(() => {
             this.addMessage(welcomeMessage, false);
-            this.logAction(`Bot: ${welcomeMessage}`);
+            this.logAction('Message de bienvenue affiché');
             this.updateStatus(true, 'Connecté');
         }, 1000);
     }
@@ -488,14 +499,22 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
 
         statusDot.classList.remove('error');
 
+        let statusString;
         if (connected === true) {
-            statusText.textContent = text || 'Connecté';
+            statusString = text || 'Connecté';
+            statusText.textContent = statusString;
         } else if (connected === false) {
             statusDot.classList.add('error');
-            statusText.textContent = text || 'Erreur';
+            statusString = text || 'Erreur';
+            statusText.textContent = statusString;
         } else {
             // État neutre (en cours de traitement)
-            statusText.textContent = text || 'En cours...';
+            statusString = text || 'En cours...';
+            statusText.textContent = statusString;
+        }
+
+        if (connected !== null) {
+            this.logAction(`Connexion: ${statusString}`);
         }
     }
 
@@ -703,7 +722,25 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
     applyColorTheme(themeId, silent = false) {
         const theme = this.themes.find(t => t.id === themeId) || this.themes[0];
         const root = document.documentElement;
-        Object.entries(theme.vars).forEach(([key, val]) => root.style.setProperty(key, val));
+
+        // Remove previously applied variables and classes
+        this.themes.forEach(t => {
+            if (t.vars) {
+                Object.keys(t.vars).forEach(key => root.style.removeProperty(key));
+            }
+        });
+        document.body.classList.remove(...this.themes.map(t => t.class).filter(Boolean));
+
+        // Apply theme class if provided
+        if (theme.class) {
+            document.body.classList.add(theme.class);
+        }
+
+        // Apply CSS variables if provided
+        if (theme.vars && Object.keys(theme.vars).length > 0) {
+            Object.entries(theme.vars).forEach(([key, val]) => root.style.setProperty(key, val));
+        }
+
         localStorage.setItem('rgpd_colorTheme', themeId);
         if (!silent) {
             this.showToast(`Thème ${theme.name} activé`, 'success');
