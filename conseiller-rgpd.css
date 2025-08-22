@@ -48,6 +48,13 @@ body.theme-ocean {
     --primary-dark: #0369a1;
     --primary-light: #38bdf8;
     --secondary: #0ea5e9;
+    --bg-dark: linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+    --bg-dark-secondary: #0f172a;
+    --text-primary: #e0f2fe;
+    --text-secondary: #a5f3fc;
+    --border: #164e63;
+    --glass: rgba(2, 132, 199, 0.15);
+    --glass-border: rgba(2, 132, 199, 0.3);
 }
 
 body.theme-forest {
@@ -55,6 +62,13 @@ body.theme-forest {
     --primary-dark: #166534;
     --primary-light: #4ade80;
     --secondary: #065f46;
+    --bg-dark: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+    --bg-dark-secondary: #052e16;
+    --text-primary: #dcfce7;
+    --text-secondary: #a7f3d0;
+    --border: #064e3b;
+    --glass: rgba(22, 163, 74, 0.15);
+    --glass-border: rgba(22, 163, 74, 0.3);
 }
 
 body.theme-sunset {
@@ -62,6 +76,13 @@ body.theme-sunset {
     --primary-dark: #9f1239;
     --primary-light: #f472b6;
     --secondary: #c2410c;
+    --bg-dark: linear-gradient(135deg, #4c0519 0%, #9f1239 100%);
+    --bg-dark-secondary: #4c0519;
+    --text-primary: #fee2e2;
+    --text-secondary: #fecdd3;
+    --border: #7f1d1d;
+    --glass: rgba(190, 18, 60, 0.15);
+    --glass-border: rgba(190, 18, 60, 0.3);
 }
 
 body {
@@ -78,6 +99,7 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.5s ease, color 0.5s ease;
 }
 
 
@@ -163,7 +185,40 @@ body {
 
 .control-btn:hover {
     transform: scale(1.1);
-    background: rgba(15, 118, 110, 0.2);
+    background: var(--primary-dark);
+    color: var(--text-primary);
+}
+
+.theme-menu {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    animation: fadeIn 0.2s ease;
+}
+
+.theme-option {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text-primary);
+    white-space: nowrap;
+    transition: background 0.3s;
+}
+
+.theme-option:hover {
+    background: var(--primary-dark);
+    color: var(--text-primary);
+}
+
+.hidden {
+    display: none;
 }
 
 .main-container {
@@ -736,4 +791,9 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

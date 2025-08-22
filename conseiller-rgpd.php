@@ -84,12 +84,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         $length = mb_strlen($assistantMessage, 'UTF-8');
         for ($i = 0; $i < $length; $i++) {
             echo mb_substr($assistantMessage, $i, 1, 'UTF-8');
-            if ($i % 20 === 0) {
-                echo "\n";
-            }
             @ob_flush();
             flush();
-            usleep(10000);
+            usleep(1000);
         }
     } else {
         http_response_code(500);
@@ -122,7 +119,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         <button class="control-btn" onclick="rgpdApp.decreaseFontSize()" title="Réduire le texte">A-</button>
         <button class="control-btn" onclick="rgpdApp.increaseFontSize()" title="Agrandir le texte">A+</button>
         <button class="control-btn" onclick="rgpdApp.toggleTheme()" title="Basculer le thème" id="themeToggle">🌙</button>
-        <button class="control-btn" onclick="rgpdApp.cycleColorTheme()" title="Changer le thème de couleur" id="colorThemeToggle">🎨</button>
+        <button class="control-btn" onclick="rgpdApp.toggleThemeMenu()" title="Changer le thème de couleur" id="colorThemeToggle">🎨</button>
+        <div class="theme-menu hidden" id="themeMenu">
+            <div class="theme-option" data-theme="">Défaut</div>
+            <div class="theme-option" data-theme="theme-ocean">Océan</div>
+            <div class="theme-option" data-theme="theme-forest">Forêt</div>
+            <div class="theme-option" data-theme="theme-sunset">Crépuscule</div>
+        </div>
     </div>
     
     <div class="main-container">
