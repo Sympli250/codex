@@ -231,7 +231,14 @@ class ConseillerRGPDApp {
         // Sécurisation et rendu du contenu
         if (!isUser && !isError) {
             const html = DOMPurify.sanitize(marked.parse(content));
-            message.innerHTML = html;
+            let html;
+            try {
+                html = DOMPurify.sanitize(marked.parse(content));
+                message.innerHTML = html;
+            } catch (e) {
+                // Fallback: render as plain text if Markdown parsing fails
+                message.textContent = content;
+            }
         } else {
             message.textContent = content;
         }
