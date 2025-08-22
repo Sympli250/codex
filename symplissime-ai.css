@@ -362,17 +362,21 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: var(--fluent-shadow-sm);
   font-family: var(--font-sans);
   font-weight: 500;
 }
 
 .control-btn:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px) scale(1.05);
   background: var(--fluent-hover-background);
-  box-shadow: var(--fluent-shadow-md);
+  box-shadow: var(--fluent-shadow-md), 0 0 8px var(--c-pri-light);
   border-color: var(--fluent-border-color-accent);
+}
+
+.control-btn.bounce {
+  animation: buttonBounce 0.3s ease;
 }
 
 #themeToggle {
@@ -575,21 +579,39 @@ body {
   display: flex;
   gap: 12px;
   position: relative;
-  animation: messageAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .message-wrapper.user {
   flex-direction: row-reverse;
 }
 
-@keyframes messageAppear {
-  0% {
+.message-wrapper.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.message-wrapper.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    transform: translateY(15px) scale(0.95);
+    transform: translateY(10px);
   }
-  100% {
+  to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 }
 
@@ -779,7 +801,7 @@ body {
   font-size: calc(15px * var(--font-scale));
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -788,7 +810,7 @@ body {
 
 .send-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: var(--fluent-shadow-md);
+  box-shadow: var(--fluent-shadow-md), 0 0 8px var(--c-pri-light);
 }
 
 .send-button:disabled {
@@ -797,21 +819,15 @@ body {
   transform: none;
 }
 
-.file-button {
-  padding: 12px;
-  background: var(--fluent-background-component);
-  border: 1px solid var(--fluent-border-color-light);
-  border-radius: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: background 0.3s ease;
+.send-button.bounce {
+  animation: buttonBounce 0.3s ease;
 }
 
-.file-button:hover {
-  background: var(--fluent-hover-background);
+@keyframes buttonBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.9); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 /* TOAST */
