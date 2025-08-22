@@ -277,7 +277,14 @@ class ConseillerRGPDApp {
     finishStreaming(messageElement) {
         if (messageElement) {
             const fullText = messageElement.textContent;
-            const html = DOMPurify.sanitize(marked.parse(fullText));
+            let html;
+            try {
+                html = DOMPurify.sanitize(marked.parse(fullText));
+            } catch (e) {
+                html = DOMPurify.sanitize('<div class="error-message">Erreur lors de l\'affichage du message.</div>');
+                // Optionally, log the error for debugging:
+                // console.error('Markdown parsing error:', e);
+            }
             messageElement.innerHTML = html;
             messageElement.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
