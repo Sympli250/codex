@@ -1,14 +1,14 @@
 /* Symplissime theme */
 body.theme-symplissime {
-  --primary: #10b981;
-  --primary-dark: #059669;
-  --primary-light: #34d399;
-  --secondary: #6366f1;
-  --bg-dark: linear-gradient(135deg, #0f172a 0%, #10b981 40%, #6366f1 80%, #ec4899 100%);
-  --bg-dark-secondary: #1e293b;
-  --text-primary: #f0fdf4;
-  --text-secondary: #bbf7d0;
-  --border: #059669;
-  --glass: rgba(16,185,129,0.15);
-  --glass-border: rgba(16,185,129,0.4);
+  --primary: #219769;
+  --primary-dark: #16734a;
+  --primary-light: #A1D44B;
+  --secondary: #60C36A;
+  --bg-dark: linear-gradient(135deg, #0f172a 0%, #16734a 40%, #A1D44B 80%, #219769 100%);
+  --bg-dark-secondary: #16734a;
+  --text-primary: #219769;
+  --text-secondary: #605E5C;
+  --border: #16734a;
+  --glass: rgba(33,151,105,0.15);
+  --glass-border: rgba(33,151,105,0.4);
 }
