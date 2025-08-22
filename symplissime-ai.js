@@ -229,7 +229,8 @@ class SymplissimeAIApp {
     }
 
     toggleTheme() {
-        // Cette méthode est maintenant remplacée par le sélecteur de thèmes
+        // Conserve la compatibilité avec l'ancien bouton
+        // en ouvrant simplement le sélecteur de thèmes
         this.toggleThemeDropdown();
     }
 
@@ -720,10 +721,6 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
         setTimeout(() => {
             document.body.style.transform = '';
         }, 150);
-    }
-
-    toggleTheme() {
-        this.showToast('Thème Symplissime actif', 'success');
     }
 
     // Méthode pour exporter tout l'historique
