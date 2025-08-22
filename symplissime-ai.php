@@ -146,15 +146,17 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
             
             <div class="chat-input-container">
                 <form class="input-form" id="chatForm">
-                    <input 
-                        type="text" 
-                        class="message-input" 
-                        id="messageInput" 
+                    <input
+                        type="text"
+                        class="message-input"
+                        id="messageInput"
                         placeholder="Posez votre question sur Windows, le support IT ou demandez de l'aide..."
                         autocomplete="off"
+                        list="promptSuggestions"
                         required
                         maxlength="1000"
                     >
+                    <datalist id="promptSuggestions"></datalist>
                     <button type="submit" class="send-button" id="sendButton">
                         <span>Envoyer</span>
                     </button>

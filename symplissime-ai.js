@@ -55,6 +55,7 @@ class SymplissimeAIApp {
         }
 
         this.loadSavedPreferences();
+        this.loadPromptSuggestions();
         this.bindEvents();
         this.updateDateTime();
         this.showWelcomeMessage();
@@ -76,6 +77,33 @@ class SymplissimeAIApp {
         if (savedTheme && this.themes[savedTheme]) {
             this.currentTheme = savedTheme;
             this.applyTheme(savedTheme);
+        }
+    }
+
+    loadPromptSuggestions() {
+        const stored = localStorage.getItem('symplissime_prompt_suggestions');
+        if (stored) {
+            try {
+                const suggestions = JSON.parse(stored);
+                suggestions.forEach(s => this.addPromptSuggestion(s, false));
+            } catch (e) {
+                console.error('Erreur chargement suggestions:', e);
+            }
+        }
+    }
+
+    addPromptSuggestion(text, save = true) {
+        const datalist = document.getElementById('promptSuggestions');
+        if (!datalist || !text) return;
+        const exists = Array.from(datalist.options).some(opt => opt.value === text);
+        if (!exists) {
+            const option = document.createElement('option');
+            option.value = text;
+            datalist.appendChild(option);
+        }
+        if (save) {
+            const values = Array.from(datalist.options).map(opt => opt.value);
+            localStorage.setItem('symplissime_prompt_suggestions', JSON.stringify(values));
         }
     }
 
@@ -239,9 +267,9 @@ class SymplissimeAIApp {
 
     async handleFormSubmit(e) {
         e.preventDefault();
-        
+
         if (this.isProcessing) return;
-        
+
         const messageInput = this.getMessageInput();
         const message = messageInput.value.trim();
         
@@ -256,6 +284,7 @@ class SymplissimeAIApp {
         }
 
         messageInput.value = '';
+        this.addPromptSuggestion(message);
         await this.sendMessage(message);
     }
 
@@ -308,50 +337,31 @@ class SymplissimeAIApp {
 
     async streamMessage(content) {
         // Créer la structure du message
-        const messageElement = this.createMessageElement(content, false, false);
+        const messageElement = this.createMessageElement('', false, false);
         const messageContentDiv = messageElement.querySelector('.message');
-        
-        // Vider le contenu initial
-        messageContentDiv.textContent = '';
-        
-        // Variables pour le streaming
-        const words = content.split(' ');
-        const totalWords = words.length;
-        
-        // Calculer la vitesse de streaming (plus rapide pour les messages courts)
-        let streamingSpeed;
-        if (totalWords < 50) {
-            streamingSpeed = 35; // 35ms entre chaque mot pour les messages courts
-        } else if (totalWords < 150) {
-            streamingSpeed = 25; // 25ms pour les messages moyens
-        } else {
-            streamingSpeed = 20; // 20ms pour les longs messages
-        }
-        
-        let currentWordIndex = 0;
-        let currentText = '';
-        
-        // Fonction de streaming
-        const streamNextWord = () => {
-            if (currentWordIndex < totalWords) {
-                currentText += (currentWordIndex > 0 ? ' ' : '') + words[currentWordIndex];
-                messageContentDiv.textContent = currentText;
-                
-                // Scroll automatique pendant le streaming
+
+        // Convertir le contenu en HTML sécurisé avant le streaming
+        const html = DOMPurify.sanitize(marked.parse(content));
+
+        // Variables pour le streaming caractère par caractère
+        const totalChars = html.length;
+        let currentIndex = 0;
+
+        const streamNextChar = () => {
+            if (currentIndex < totalChars) {
+                messageContentDiv.innerHTML = html.slice(0, currentIndex + 1);
                 this.scrollToBottom();
-                
-                currentWordIndex++;
-                
-                // Programmer le prochain mot
-                this.streamingInterval = setTimeout(streamNextWord, streamingSpeed);
+                currentIndex++;
+                // Vitesse de streaming rapide par caractère
+                this.streamingInterval = setTimeout(streamNextChar, 5);
             } else {
                 // Streaming terminé
                 this.finishStreaming(messageElement, content);
             }
         };
-        
+
         // Démarrer le streaming
-        streamNextWord();
+        streamNextChar();
     }
 
     createMessageElement(content, isUser = false, isError = false) {
@@ -395,23 +405,26 @@ class SymplissimeAIApp {
 
     finishStreaming(messageElement, content) {
         const messageDiv = messageElement.querySelector('.message');
-        this.renderMarkdown(messageDiv, content);
+        // Appliquer la coloration syntaxique après insertion complète
+        messageDiv.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
 
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser: false, isError: false, timestamp: new Date() });
-        
+
         // Ajouter les actions pour les messages du bot
         const messageContent = messageElement.querySelector('.message-content');
         const actions = this.createMessageActions(content);
         messageContent.appendChild(actions);
-        
+
         // Nettoyer les références de streaming
         this.currentStreamingMessage = null;
         if (this.streamingInterval) {
             clearTimeout(this.streamingInterval);
             this.streamingInterval = null;
         }
-        
+
         this.scrollToBottom();
     }
 
