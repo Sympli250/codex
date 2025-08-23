@@ -196,7 +196,7 @@ body, input, textarea, button {
 }
 
 /* Amélioration des polices mono */
-.datetime, .message-input, code, pre {
+.message-input, code, pre {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   -webkit-font-feature-settings: 'tnum' 1, 'zero' 1;
@@ -506,18 +506,6 @@ body {
   display: flex;
   gap: 12px;
   font-weight: 500;
-}
-
-.datetime {
-  font-size: calc(13px * var(--font-scale));
-  color: white;
-  font-family: var(--font-mono);
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 .status-badge {
@@ -951,10 +939,6 @@ body {
     padding: 8px;
     border-radius: 20px;
     border: 1px solid var(--fluent-border-color-light);
-  }
-  
-  .datetime {
-    display: none;
   }
   
   .powered-by {

@@ -72,14 +72,10 @@ class SymplissimeAIApp {
         this.loadSavedPreferences();
         this.loadPromptSuggestions();
         this.bindEvents();
-        this.updateDateTime();
         this.updateStatus('connected', 'Connecté');
         this.showWelcomeMessage();
         this.focusInput();
         this.createThemeSelector();
-        
-        // Mise à jour de l'heure chaque seconde
-        setInterval(() => this.updateDateTime(), 1000);
     }
 
     loadSavedPreferences() {
@@ -580,21 +576,6 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
             await this.streamMessage(welcomeMessage);
         }, 1000);
     }
-    updateDateTime() {
-        const datetimeElement = document.getElementById('datetime');
-        if (!datetimeElement) return;
-
-        const now = new Date();
-        const year = now.getUTCFullYear();
-        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(now.getUTCDate()).padStart(2, '0');
-        const hours = String(now.getUTCHours()).padStart(2, '0');
-        const minutes = String(now.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(now.getUTCSeconds()).padStart(2, '0');
-        
-        datetimeElement.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    }
-
     updateStatus(state, message = null, progress = null) {
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
