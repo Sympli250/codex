@@ -105,7 +105,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                     <div class="header-info">
                         <button type="button" class="symplissime-branding">
                             <div class="symplissime-logo">S</div>
-                            <span class="symplissime-text">Symplissime</span>
+                            <span class="symplissime-text">Symplissime Ai</span>
                         </button>
                     </div>
                 </div>
