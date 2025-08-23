@@ -93,7 +93,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="symplissime-ai.css">
+    <link rel="stylesheet" href="symplissieai.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
 </head>
 <body>
@@ -176,6 +176,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-    <script src="symplissime-ai.js"></script>
+    <script src="symplissimeai.php"></script>
 </body>
 </html>

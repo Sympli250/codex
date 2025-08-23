@@ -4,7 +4,7 @@ Ce projet fournit une interface JavaScript pour discuter avec Symplissime AI et 
 
 ## Configuration de la clé API
 
-Avant de charger `symplissime-ai.js`, définissez l'objet global `SYMPLISSIME_CONFIG` pour fournir vos identifiants :
+Avant de charger `symplissimeai.php`, définissez l'objet global `SYMPLISSIME_CONFIG` pour fournir vos identifiants :
 
 ```html
 <script>

@@ -640,7 +640,7 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
     saveAsFile(text, filename = null) {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const defaultFilename = `symplissime-ai-${timestamp}.txt`;
+        const defaultFilename = `symplissimeai-${timestamp}.txt`;
         
         try {
             const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -741,7 +741,7 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
 
 `;
 
-        this.saveAsFile(header + history, `historique-symplissime-ai-${new Date().toISOString().slice(0, 10)}.txt`);
+        this.saveAsFile(header + history, `historique-symplissimeai-${new Date().toISOString().slice(0, 10)}.txt`);
     }
 
     // Méthode pour vider l'historique
