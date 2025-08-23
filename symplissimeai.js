@@ -509,20 +509,34 @@ class SymplissimeAIApp {
         
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
-        
+
         const message = document.createElement('div');
         message.className = `message ${isUser ? 'user' : 'bot'} ${isError ? 'error' : ''}`;
-        
+
         // Sécurisation du contenu
         message.textContent = content;
-        
+
+        const meta = document.createElement('div');
+        meta.className = 'message-meta';
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'timestamp';
+        timeSpan.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        meta.appendChild(timeSpan);
+
+        if (isUser) {
+            const readSpan = document.createElement('span');
+            readSpan.className = 'read-status';
+            meta.appendChild(readSpan);
+        }
+
         messageContent.appendChild(message);
+        messageContent.appendChild(meta);
         wrapper.appendChild(avatar);
         wrapper.appendChild(messageContent);
         chatMessages.appendChild(wrapper);
-        
+
         this.scrollToBottom();
-        
+
         return wrapper;
     }
 
@@ -558,6 +572,7 @@ class SymplissimeAIApp {
         }
 
         this.scrollToBottom();
+        this.markLastUserMessageAsRead();
         this.updateStatus('done', 'Terminé', 100);
         setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
     }
@@ -601,6 +616,9 @@ class SymplissimeAIApp {
 
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser, isError, timestamp: new Date() });
+        if (!isUser && !isError) {
+            this.markLastUserMessageAsRead();
+        }
 
         this.scrollToBottom();
     }
@@ -722,6 +740,17 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }, 50);
+        }
+    }
+
+    markLastUserMessageAsRead() {
+        const userMessages = document.querySelectorAll('.message-wrapper.user');
+        const lastUserMessage = userMessages[userMessages.length - 1];
+        if (lastUserMessage) {
+            const readStatus = lastUserMessage.querySelector('.read-status');
+            if (readStatus) {
+                readStatus.textContent = 'Vu';
+            }
         }
     }
 

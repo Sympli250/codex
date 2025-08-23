@@ -116,12 +116,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                         <span id="statusProgress"></span>
                     </div>
                     <div class="controls-panel">
-                        <button class="control-btn" onclick="symplissimeApp.decreaseFontSize()" title="Réduire le texte">A-</button>
-                        <button class="control-btn" onclick="symplissimeApp.increaseFontSize()" title="Agrandir le texte">A+</button>
-                        <button class="control-btn" id="fontToggle" title="Changer de police">Aa</button>
-                        <button class="control-btn" id="themeToggle" title="Changer de thème">🌿</button>
-                        <button class="control-btn" onclick="symplissimeApp.exportHistory()" title="Exporter historique">📥</button>
-                        <button class="control-btn" onclick="symplissimeApp.clearHistory()" title="Vider historique">🗑️</button>
+                        <button class="control-btn" onclick="symplissimeApp.decreaseFontSize()" title="Réduire le texte" data-tooltip="Réduire le texte">A-</button>
+                        <button class="control-btn" onclick="symplissimeApp.increaseFontSize()" title="Agrandir le texte" data-tooltip="Agrandir le texte">A+</button>
+                        <button class="control-btn" id="fontToggle" title="Changer de police" data-tooltip="Changer de police">Aa</button>
+                        <button class="control-btn" id="themeToggle" title="Changer de thème" data-tooltip="Changer de thème">🌿</button>
+                        <button class="control-btn" onclick="symplissimeApp.exportHistory()" title="Exporter historique" data-tooltip="Exporter l'historique">📥</button>
+                        <button class="control-btn" onclick="symplissimeApp.clearHistory()" title="Vider historique" data-tooltip="Vider l'historique">🗑️</button>
                     </div>
                 </div>
                 <div class="powered-by">
@@ -146,7 +146,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                         maxlength="1000"
                     >
                     <datalist id="promptSuggestions"></datalist>
-                    <button type="submit" class="send-button" id="sendButton">
+                    <button type="submit" class="send-button" id="sendButton" data-tooltip="Envoyer le message">
                         <span>Envoyer</span>
                     </button>
                 </form>
