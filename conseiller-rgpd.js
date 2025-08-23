@@ -36,6 +36,7 @@ class ConseillerRGPDApp {
             'Chaque commit te rapproche de la gloire.',
             'Un refactor intelligent évite des larmes.'
         ];
+        this.easterEggs = ['confettis', 'darkflip', 'fortune', 'matrix', 'cameleon'];
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -324,6 +325,9 @@ class ConseillerRGPDApp {
             case 'cameleon':
                 this.cameleon();
                 return true;
+            case 'eastereggs':
+                this.listEasterEggs();
+                return true;
             default:
                 this.showToast('Commande inconnue', 'warning');
                 return true;
@@ -404,6 +408,11 @@ class ConseillerRGPDApp {
         }, 10000);
     }
 
+    listEasterEggs() {
+        const list = this.easterEggs.map(cmd => `/${cmd}`).join(', ');
+        this.addMessage(`🥚 Easter eggs disponibles : ${list}`, false, false);
+    }
+
     addMessage(content, isUser = false, isError = false) {
         const chatMessages = this.chatMessages;
         if (!chatMessages) return;
@@ -438,9 +447,11 @@ class ConseillerRGPDApp {
         }
         
         messageContent.appendChild(message);
-        
-        // Actions pour les messages du bot (non-erreur)
+
+        // Feedback et actions pour les messages du bot (non-erreur)
         if (!isUser && !isError) {
+            const feedback = this.createFeedbackButtons();
+            messageContent.appendChild(feedback);
             const actions = this.createMessageActions(content);
             messageContent.appendChild(actions);
         }
@@ -506,6 +517,27 @@ class ConseillerRGPDApp {
             }
             this.logAction('Réponse bot terminée');
         }
+    }
+
+    createFeedbackButtons() {
+        const container = document.createElement('div');
+        container.className = 'feedback-buttons';
+
+        const up = document.createElement('button');
+        up.className = 'feedback-btn';
+        up.textContent = '👍';
+        up.title = 'Réponse satisfaisante';
+        up.onclick = () => this.showToast('Merci pour votre retour !', 'success');
+
+        const down = document.createElement('button');
+        down.className = 'feedback-btn';
+        down.textContent = '👎';
+        down.title = 'Réponse insuffisante';
+        down.onclick = () => this.showToast('Merci pour votre retour !', 'error');
+
+        container.appendChild(up);
+        container.appendChild(down);
+        return container;
     }
 
     createMessageActions(content) {

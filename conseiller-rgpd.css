@@ -427,6 +427,7 @@ body {
 .message-content {
     flex: 1;
     max-width: 75%;
+    position: relative;
 }
 
 .message {
@@ -477,6 +478,34 @@ body {
 .message-wrapper:hover .message-actions {
     opacity: 1;
     transform: translateY(0);
+}
+
+.feedback-buttons {
+    position: absolute;
+    top: 8px;
+    right: -45px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.feedback-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+.feedback-btn:hover {
+    background: var(--primary);
+    color: var(--text-primary);
 }
 
 .action-btn {

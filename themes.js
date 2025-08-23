@@ -154,7 +154,7 @@ window.RGPD_THEMES = [
   },
   {
     id: 'rainbow',
-    name: 'Arc-en-ciel',
+    name: 'RAINBOW',
     vars: {
       '--primary': '#ff0000',
       '--primary-dark': '#b30000',
