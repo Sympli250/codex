@@ -153,6 +153,23 @@ window.RGPD_THEMES = [
     }
   },
   {
+    id: 'rainbow',
+    name: 'Arc-en-ciel',
+    vars: {
+      '--primary': '#ff0000',
+      '--primary-dark': '#b30000',
+      '--primary-light': '#ff7f7f',
+      '--secondary': '#ffbf00',
+      '--bg-dark': 'linear-gradient(135deg, #ff0000 0%, #ff7f00 17%, #ffff00 34%, #00ff00 51%, #0000ff 68%, #4b0082 85%, #9400d3 100%)',
+      '--bg-dark-secondary': '#1e1e1e',
+      '--text-primary': '#ffffff',
+      '--text-secondary': '#ffe4e6',
+      '--border': '#ff00ff',
+      '--glass': 'rgba(255,255,255,0.15)',
+      '--glass-border': 'rgba(255,255,255,0.4)'
+    }
+  },
+  {
     id: 'symplissime',
     name: 'Symplissime',
     class: 'theme-symplissime',
