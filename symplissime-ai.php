@@ -97,14 +97,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
 </head>
 <body>
-    <!-- Symplissime Branding -->
-    <div class="symplissime-branding">
-        <div class="symplissime-logo">S</div>
-        <span class="symplissime-text">Symplissime AI</span>
-    </div>
-
     <div class="main-container">
         <div class="chat-container" id="chatContainer">
+            <!-- Symplissime Branding -->
+            <div class="symplissime-branding">
+                <div class="symplissime-logo">S</div>
+                <span class="symplissime-text">Symplissime AI</span>
+            </div>
             <div class="chat-header">
                 <div class="header-left">
                     <div class="logo">AI</div>
