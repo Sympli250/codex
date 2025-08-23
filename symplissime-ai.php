@@ -99,16 +99,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
 <body>
     <div class="main-container">
         <div class="chat-container" id="chatContainer">
-            <!-- Symplissime Branding -->
-            <div class="symplissime-branding">
-                <div class="symplissime-logo">S</div>
-                <span class="symplissime-text">Symplissime AI</span>
-            </div>
             <div class="chat-header">
                 <div class="header-left">
                     <div class="logo">AI</div>
                     <div class="header-info">
-                        <h1>Symplissime AI</h1>
+                        <button type="button" class="symplissime-branding">
+                            <div class="symplissime-logo">S</div>
+                            <span class="symplissime-text">Symplissime</span>
+                        </button>
                         <div class="subtitle">
                             <span>👤 Utilisateur : <?php echo htmlspecialchars($CURRENT_USER); ?></span>
                             <span>🖥️ Support Windows & IT</span>

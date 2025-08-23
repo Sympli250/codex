@@ -351,9 +351,6 @@ body {
 
 /* BRANDING SYMPLISSIME */
 .symplissime-branding {
-  position: absolute;
-  top: 20px;
-  left: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -361,9 +358,10 @@ body {
   background: var(--fluent-background-component);
   border: 1px solid var(--fluent-border-color-light);
   border-radius: 20px;
-  z-index: 1000;
   transition: all 0.3s ease;
   box-shadow: var(--fluent-shadow-sm);
+  cursor: pointer;
+  margin-bottom: 4px;
 }
 
 .symplissime-branding:hover {
@@ -943,8 +941,6 @@ body {
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .symplissime-branding {
-    top: 10px;
-    left: 10px;
     padding: 6px 10px;
   }
   
