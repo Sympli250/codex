@@ -10,7 +10,7 @@ class SymplissimeAIApp {
         // window.SYMPLISSIME_CONFIG = { API_KEY: 'votre_cle', WORKSPACE: 'id', USER: 'nom' };
         this.config = window.SYMPLISSIME_CONFIG || {};
         // Increase base font scale for better readability
-        this.fontScale = 1.1;
+        this.fontScale = 1.2;
         this.isProcessing = false;
         this.messageHistory = [];
         this.currentStreamingMessage = null;
@@ -96,8 +96,8 @@ class SymplissimeAIApp {
         const savedFontScale = localStorage.getItem('symplissime_fontScale');
         if (savedFontScale) {
             this.fontScale = parseFloat(savedFontScale);
-            document.documentElement.style.setProperty('--font-scale', this.fontScale);
         }
+        document.documentElement.style.setProperty('--font-scale', this.fontScale);
         
         const savedTheme = localStorage.getItem('symplissime_theme');
         if (savedTheme && this.themes[savedTheme]) {
