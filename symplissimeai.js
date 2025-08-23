@@ -16,30 +16,31 @@ class SymplissimeAIApp {
         this.currentStreamingMessage = null;
         this.streamingInterval = null;
         this.currentTheme = 'symplissime';
-        
+        this.currentFont = 'inter';
+
         this.themes = {
-            'symplissime': { 
-                name: 'Symplissime Green', 
+            'symplissime': {
+                name: 'Symplissime Green',
                 icon: '🌿',
                 attribute: null // Thème par défaut, pas d'attribut data-theme
             },
-            'ocean': { 
-                name: 'Ocean Blue', 
+            'ocean': {
+                name: 'Ocean Blue',
                 icon: '🌊',
                 attribute: 'ocean-blue'
             },
-            'sunset': { 
-                name: 'Sunset Orange', 
+            'sunset': {
+                name: 'Sunset Orange',
                 icon: '🌅',
                 attribute: 'sunset-orange'
             },
-            'purple': { 
-                name: 'Royal Purple', 
+            'purple': {
+                name: 'Royal Purple',
                 icon: '💜',
                 attribute: 'royal-purple'
             },
-            'crimson': { 
-                name: 'Crimson Red', 
+            'crimson': {
+                name: 'Crimson Red',
                 icon: '🔥',
                 attribute: 'crimson-red'
             },
@@ -47,17 +48,29 @@ class SymplissimeAIApp {
                 name: 'Midnight Dark',
                 icon: '🌙',
                 attribute: 'midnight-dark'
+            }
+        };
+
+        this.fonts = {
+            'inter': {
+                name: 'Inter',
+                css: "'Inter', sans-serif"
             },
-            // Additional themes
-            'forest': {
-                name: 'Forest Green',
-                icon: '🌲',
-                attribute: 'forest-theme'
+            'roboto': {
+                name: 'Roboto',
+                css: "'Roboto', sans-serif"
             },
-            'neon': {
-                name: 'Neon Lights',
-                icon: '🎇',
-                attribute: 'neon-theme'
+            'opensans': {
+                name: 'Open Sans',
+                css: "'Open Sans', sans-serif"
+            },
+            'lato': {
+                name: 'Lato',
+                css: "'Lato', sans-serif"
+            },
+            'montserrat': {
+                name: 'Montserrat',
+                css: "'Montserrat', sans-serif"
             }
         };
         
@@ -76,6 +89,7 @@ class SymplissimeAIApp {
         this.showWelcomeMessage();
         this.focusInput();
         this.createThemeSelector();
+        this.createFontSelector();
     }
 
     loadSavedPreferences() {
@@ -89,6 +103,12 @@ class SymplissimeAIApp {
         if (savedTheme && this.themes[savedTheme]) {
             this.currentTheme = savedTheme;
             this.applyTheme(savedTheme);
+        }
+
+        const savedFont = localStorage.getItem('symplissime_font');
+        if (savedFont && this.fonts[savedFont]) {
+            this.currentFont = savedFont;
+            this.applyFont(savedFont);
         }
     }
 
@@ -240,6 +260,95 @@ class SymplissimeAIApp {
         // Conserve la compatibilité avec l'ancien bouton
         // en ouvrant simplement le sélecteur de thèmes
         this.toggleThemeDropdown();
+    }
+
+    createFontSelector() {
+        const fontToggle = document.getElementById('fontToggle');
+        if (!fontToggle) return;
+
+        const fontSelector = document.createElement('div');
+        fontSelector.className = 'font-selector';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'font-dropdown';
+        dropdown.id = 'fontDropdown';
+
+        Object.entries(this.fonts).forEach(([key, font]) => {
+            const option = document.createElement('div');
+            option.className = `font-option ${key === this.currentFont ? 'active' : ''}`;
+            option.dataset.font = key;
+
+            const name = document.createElement('span');
+            name.textContent = font.name;
+            name.style.fontFamily = font.css;
+
+            option.appendChild(name);
+
+            option.addEventListener('click', () => {
+                this.selectFont(key);
+                this.hideFontDropdown();
+            });
+
+            dropdown.appendChild(option);
+        });
+
+        fontToggle.parentNode.insertBefore(fontSelector, fontToggle);
+        fontSelector.appendChild(fontToggle);
+        fontSelector.appendChild(dropdown);
+
+        fontToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleFontDropdown();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!fontSelector.contains(e.target)) {
+                this.hideFontDropdown();
+            }
+        });
+    }
+
+    toggleFontDropdown() {
+        const dropdown = document.getElementById('fontDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    hideFontDropdown() {
+        const dropdown = document.getElementById('fontDropdown');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    selectFont(fontKey) {
+        if (this.fonts[fontKey] && fontKey !== this.currentFont) {
+            this.currentFont = fontKey;
+            this.applyFont(fontKey);
+
+            document.querySelectorAll('.font-option').forEach(option => {
+                if (option.dataset.font === fontKey) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+
+            localStorage.setItem('symplissime_font', fontKey);
+            this.showToast(`Police ${this.fonts[fontKey].name} appliquée`, 'success');
+        }
+    }
+
+    applyFont(fontKey) {
+        const font = this.fonts[fontKey]?.css;
+        if (font) {
+            document.documentElement.style.setProperty('--font-sans', font);
+        }
+    }
+
+    toggleFont() {
+        this.toggleFontDropdown();
     }
 
     bindEvents() {
@@ -779,6 +888,7 @@ window.symplissimeApp = {
     increaseFontSize: () => symplissimeApp?.increaseFontSize(),
     decreaseFontSize: () => symplissimeApp?.decreaseFontSize(),
     toggleTheme: () => symplissimeApp?.toggleTheme(),
+    toggleFont: () => symplissimeApp?.toggleFont(),
     exportHistory: () => symplissimeApp?.exportChatHistory(),
     clearHistory: () => symplissimeApp?.clearHistory()
 };
