@@ -214,12 +214,13 @@ body {
 }
 
 /* Sélecteur de thème */
-.theme-selector {
+
+.theme-selector, .font-selector {
   position: relative;
   display: inline-block;
 }
 
-.theme-dropdown {
+.theme-dropdown, .font-dropdown {
   display: none;
   position: absolute;
   right: 0;
@@ -234,7 +235,7 @@ body {
   animation: dropdownFadeIn 0.2s ease-out;
 }
 
-.theme-dropdown.show {
+.theme-dropdown.show, .font-dropdown.show {
   display: block;
 }
 
@@ -249,7 +250,7 @@ body {
   }
 }
 
-.theme-option {
+.theme-option, .font-option {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -263,22 +264,22 @@ body {
   margin-bottom: 4px;
 }
 
-.theme-option:last-child {
+.theme-option:last-child, .font-option:last-child {
   margin-bottom: 0;
 }
 
-.theme-option:hover {
+.theme-option:hover, .font-option:hover {
   background: var(--fluent-hover-background);
   transform: translateX(2px);
 }
 
-.theme-option.active {
+.theme-option.active, .font-option.active {
   background: var(--fluent-primary);
   color: white;
   box-shadow: var(--fluent-shadow-sm);
 }
 
-.theme-option.active:hover {
+.theme-option.active:hover, .font-option.active:hover {
   background: var(--c-pri-dark);
 }
 
@@ -392,13 +393,15 @@ body {
 }
 
 /* CONTROLS PANEL */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .controls-panel {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   display: flex;
   gap: 10px;
-  z-index: 1000;
 }
 
 .control-btn {
@@ -419,11 +422,23 @@ body {
   font-weight: 500;
 }
 
+.chat-header .control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
 .control-btn:hover {
   transform: translateY(-2px) scale(1.05);
   background: var(--fluent-hover-background);
   box-shadow: var(--fluent-shadow-md), 0 0 8px var(--c-pri-light);
   border-color: var(--fluent-border-color-accent);
+}
+
+.chat-header .control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--fluent-shadow-sm);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .control-btn.bounce {
@@ -932,13 +947,7 @@ body {
   }
   
   .controls-panel {
-    bottom: 80px;
-    top: auto;
-    right: 20px;
-    background: var(--fluent-background-component);
-    padding: 8px;
-    border-radius: 20px;
-    border: 1px solid var(--fluent-border-color-light);
+    gap: 6px;
   }
   
   .powered-by {

@@ -90,7 +90,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Symplissime AI - Assistant Support Windows</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:wght@100..900&family=Open+Sans:wght@300..800&family=Lato:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="symplissieai.css">
@@ -103,15 +103,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
         <span class="symplissime-text">Symplissime AI</span>
     </div>
 
-    <!-- Controls Panel -->
-    <div class="controls-panel">
-        <button class="control-btn" onclick="symplissimeApp.decreaseFontSize()" title="Réduire le texte">A-</button>
-        <button class="control-btn" onclick="symplissimeApp.increaseFontSize()" title="Agrandir le texte">A+</button>
-        <button class="control-btn" onclick="symplissimeApp.toggleTheme()" title="Changer de thème" id="themeToggle">🌿</button>
-        <button class="control-btn" onclick="symplissimeApp.exportHistory()" title="Exporter historique">📥</button>
-        <button class="control-btn" onclick="symplissimeApp.clearHistory()" title="Vider historique">🗑️</button>
-    </div>
-    
     <div class="main-container">
         <div class="chat-container" id="chatContainer">
             <div class="chat-header">
@@ -125,11 +116,19 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="header-right">
                     <div class="status-badge">
                         <div class="status-dot" id="statusDot"></div>
                         <span id="statusText">Connexion...</span>
                         <span id="statusProgress"></span>
+                    </div>
+                    <div class="controls-panel">
+                        <button class="control-btn" onclick="symplissimeApp.decreaseFontSize()" title="Réduire le texte">A-</button>
+                        <button class="control-btn" onclick="symplissimeApp.increaseFontSize()" title="Agrandir le texte">A+</button>
+                        <button class="control-btn" id="fontToggle" title="Changer de police">Aa</button>
+                        <button class="control-btn" id="themeToggle" title="Changer de thème">🌿</button>
+                        <button class="control-btn" onclick="symplissimeApp.exportHistory()" title="Exporter historique">📥</button>
+                        <button class="control-btn" onclick="symplissimeApp.clearHistory()" title="Vider historique">🗑️</button>
                     </div>
                 </div>
                 <div class="powered-by">
