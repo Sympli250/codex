@@ -707,7 +707,7 @@ body {
 
 .message-content {
   flex: 1;
-  max-width: 75%;
+  max-width: 100%;
 }
 
 .message {
@@ -721,8 +721,7 @@ body {
   font-weight: 400;
   position: relative;
   overflow: hidden;
-  /* Limit line length for better readability */
-  max-width: 60ch;
+  max-width: 100%;
 }
 
 .message.user {

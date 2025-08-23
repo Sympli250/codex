@@ -107,10 +107,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                             <div class="symplissime-logo">S</div>
                             <span class="symplissime-text">Symplissime</span>
                         </button>
-                        <div class="subtitle">
-                            <span>👤 Utilisateur : <?php echo htmlspecialchars($CURRENT_USER); ?></span>
-                            <span>🖥️ Support Windows & IT</span>
-                        </div>
                     </div>
                 </div>
                 <div class="header-right">
