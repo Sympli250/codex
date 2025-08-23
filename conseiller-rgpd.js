@@ -27,6 +27,15 @@ class ConseillerRGPDApp {
         this.fontClasses = ['font-inter', 'font-roboto', 'font-lato', 'font-poppins', 'font-jetbrains'];
         this.debugLog = [];
         this.requestStartTime = null;
+        this.currentTheme = '';
+        this.matrixInterval = null;
+        this.fortunes = [
+            'Une sauvegarde réussie illumine ta journée.',
+            'Ton code sera sans bug aujourd\'hui.',
+            'Le café chaud mène à la productivité.',
+            'Chaque commit te rapproche de la gloire.',
+            'Un refactor intelligent évite des larmes.'
+        ];
         // Cache frequently accessed DOM elements
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -191,7 +200,7 @@ class ConseillerRGPDApp {
 
         const messageInput = this.messageInput;
         const message = messageInput.value.trim();
-        
+
         if (!message) {
             this.showToast('Veuillez saisir un message', 'warning');
             return;
@@ -199,6 +208,12 @@ class ConseillerRGPDApp {
 
         if (message.length > 1000) {
             this.showToast('Message trop long (max 1000 caractères)', 'error');
+            return;
+        }
+
+        if (this.processSlashCommand(message)) {
+            messageInput.value = '';
+            this.updateSendButtonState();
             return;
         }
 
@@ -287,6 +302,106 @@ class ConseillerRGPDApp {
         if (!sendButton) return;
         const hasText = this.messageInput && this.messageInput.value.trim().length > 0;
         sendButton.classList.toggle('active', hasText && !this.isProcessing && !sendButton.disabled);
+    }
+
+    processSlashCommand(message) {
+        if (!message.startsWith('/')) return false;
+        const cmd = message.slice(1).toLowerCase();
+        switch (cmd) {
+            case 'confettis':
+                this.triggerConfetti();
+                this.showToast('🎉 Party time!', 'success');
+                return true;
+            case 'darkflip':
+                this.darkFlip();
+                return true;
+            case 'fortune':
+                this.showFortune();
+                return true;
+            case 'matrix':
+                this.startMatrix();
+                return true;
+            case 'cameleon':
+                this.cameleon();
+                return true;
+            default:
+                this.showToast('Commande inconnue', 'warning');
+                return true;
+        }
+    }
+
+    triggerConfetti() {
+        const container = document.createElement('div');
+        container.className = 'confetti-container';
+        for (let i = 0; i < 150; i++) {
+            const conf = document.createElement('span');
+            conf.className = 'confetti';
+            conf.style.left = Math.random() * 100 + '%';
+            conf.style.backgroundColor = `hsl(${Math.random() * 360},100%,50%)`;
+            container.appendChild(conf);
+        }
+        document.body.appendChild(container);
+        setTimeout(() => container.remove(), 3000);
+    }
+
+    darkFlip() {
+        document.body.classList.toggle('light-mode');
+        this.showToast('🌙 Mode secret activé', 'success');
+        setTimeout(() => {
+            document.body.classList.toggle('light-mode');
+            this.showToast('☀️ Retour à la normale', 'success');
+        }, 5000);
+    }
+
+    showFortune() {
+        const fortune = this.fortunes[Math.floor(Math.random() * this.fortunes.length)];
+        const msgEl = this.addMessage(`🔮 [Easter Egg] ${fortune}`, false, false);
+        const wrapper = msgEl?.closest('.message-wrapper');
+        if (wrapper) wrapper.classList.add('easter-egg');
+    }
+
+    startMatrix() {
+        if (this.matrixInterval) return;
+        const canvas = document.createElement('canvas');
+        canvas.className = 'matrix-canvas';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const columns = Math.floor(canvas.width / 10);
+        const drops = Array(columns).fill(0);
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0,0,0,0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
+            drops.forEach((y, i) => {
+                const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                const x = i * 10;
+                ctx.fillText(text, x, y);
+                drops[i] = y > canvas.height + Math.random() * 100 ? 0 : y + 10;
+            });
+        };
+        this.matrixInterval = setInterval(draw, 50);
+        setTimeout(() => {
+            clearInterval(this.matrixInterval);
+            this.matrixInterval = null;
+            canvas.remove();
+        }, 8000);
+        this.showToast('💻 Welcome to the Matrix', 'success');
+    }
+
+    cameleon() {
+        const originalTheme = this.currentTheme;
+        const mascot = document.createElement('div');
+        mascot.className = 'cameleon-mascot';
+        mascot.textContent = '🦎';
+        document.body.appendChild(mascot);
+        this.applyColorTheme('rainbow', true);
+        this.showToast('🦎 Le caméléon vous observe…', 'success');
+        setTimeout(() => {
+            this.applyColorTheme(originalTheme, true);
+            mascot.remove();
+        }, 10000);
     }
 
     addMessage(content, isUser = false, isError = false) {
@@ -742,6 +857,7 @@ Comment puis-je vous accompagner dans votre démarche de conformité RGPD aujour
         }
 
         localStorage.setItem('rgpd_colorTheme', themeId);
+        this.currentTheme = themeId;
         if (!silent) {
             this.showToast(`Thème ${theme.name} activé`, 'success');
         }
