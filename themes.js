@@ -161,7 +161,8 @@ window.RGPD_THEMES = [
       '--primary-light': '#ff7f7f',
       '--secondary': '#ffbf00',
       '--bg-dark': 'linear-gradient(135deg, #ff0000 0%, #ff7f00 17%, #ffff00 34%, #00ff00 51%, #0000ff 68%, #4b0082 85%, #9400d3 100%)',
-      '--bg-dark-secondary': '#1e1e1e',
+      // Utilise le même dégradé pour les éléments secondaires afin que le thème soit bien visible
+      '--bg-dark-secondary': 'linear-gradient(135deg, #ff0000 0%, #ff7f00 17%, #ffff00 34%, #00ff00 51%, #0000ff 68%, #4b0082 85%, #9400d3 100%)',
       '--text-primary': '#ffffff',
       '--text-secondary': '#ffe4e6',
       '--border': '#ff00ff',
