@@ -7,9 +7,6 @@ $API_KEY = 'DV90GFR-8YR4RW2-G9BMCQ9-9X96PW5';
 $DEFAULT_WORKSPACE = 'support-windows';
 $CURRENT_USER = 'symplissime-backoffice';
 
-// Set timezone to UTC
-date_default_timezone_set('UTC');
-
 // Handle chat requests
 if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     header('Content-Type: application/json');
@@ -129,7 +126,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                     </div>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
-                    <div class="datetime" id="datetime"><?php echo gmdate('Y-m-d H:i:s'); ?></div>
                     <div class="status-badge">
                         <div class="status-dot" id="statusDot"></div>
                         <span id="statusText">Connexion...</span>
