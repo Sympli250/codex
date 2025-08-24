@@ -518,7 +518,7 @@ class SymplissimeAIApp {
         // Variables pour le streaming par blocs
         const totalChars = html.length;
         let currentIndex = 0;
-        const chunkSize = 10; // nombre de caractères affichés à chaque tick
+        const chunkSize = 15; // nombre de caractères affichés à chaque tick
 
         const streamNextChunk = () => {
             if (currentIndex < totalChars) {
@@ -585,44 +585,179 @@ class SymplissimeAIApp {
 
     renderMarkdown(element, content) {
         if (!element) return;
+
         const html = this.generateHTML(content);
         element.innerHTML = html;
-        element.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
+
+        if (window.hljs) {
+            element.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        element.querySelectorAll('p').forEach(p => {
+            p.classList.add('formatted-paragraph');
+        });
+
+        element.querySelectorAll('ul, ol').forEach(list => {
+            list.classList.add('formatted-list');
         });
     }
 
     generateHTML(content) {
-        let processed = content;
-        if (window.stringStripHtml && typeof window.stringStripHtml.stripHtml === 'function') {
-            processed = window.stringStripHtml.stripHtml(processed, {
-                trimOnlySpaces: true
-            }).result;
+        // 1. Nettoyer le contenu brut avant tout traitement
+        let processed = this.cleanRawContent(content);
+
+        // 2. Configurer marked pour un meilleur rendu
+        if (window.marked) {
+            marked.setOptions({
+                breaks: false, // IMPORTANT: false pour éviter les doubles breaks
+                gfm: true,
+                headerIds: false,
+                mangle: false,
+                pedantic: false,
+                sanitize: false,
+                smartLists: true,
+                smartypants: true,
+                xhtml: false
+            });
+
+            processed = marked.parse(processed);
         }
-        processed = processed
-            .replace(/\r\n/g, '\n')
-            .replace(/\n{3,}/g, '\n\n');
 
-        let html = marked.parse(processed);
-
+        // 3. Nettoyer et sanitizer le HTML
         if (window.DOMPurify) {
-            html = DOMPurify.sanitize(html);
+            processed = DOMPurify.sanitize(processed, {
+                ALLOWED_TAGS: [
+                    'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a', 'img', 'table',
+                    'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'span', 'div'
+                ],
+                ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target'],
+                ALLOW_DATA_ATTR: false,
+                KEEP_CONTENT: true
+            });
         }
 
-        if (typeof htmlClean === 'function') {
-            html = htmlClean(html);
-        }
+        // 4. Post-traitement du HTML
+        processed = this.postProcessHTML(processed);
 
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
+        return processed;
+    }
 
-        wrapper.querySelectorAll('p').forEach(p => {
-            if (!p.textContent.trim()) p.remove();
+    cleanRawContent(content) {
+        if (!content) return '';
+
+        let cleaned = content;
+
+        // Normaliser les fins de ligne
+        cleaned = cleaned.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        // Supprimer les espaces en début et fin
+        cleaned = cleaned.trim();
+
+        // Réduire les multiples retours à la ligne consécutifs à maximum 2
+        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+
+        // Nettoyer les espaces multiples sur une même ligne
+        cleaned = cleaned.replace(/[^\S\n]{2,}/g, ' ');
+
+        // Préserver la structure des listes et blocs de code
+        cleaned = this.preserveListStructure(cleaned);
+        cleaned = this.preserveCodeBlocks(cleaned);
+
+        return cleaned;
+    }
+
+    preserveListStructure(content) {
+        const listPattern = /^(\s*[-*+•]\s+.+)$/gm;
+        const numberedListPattern = /^(\s*\d+\.\s+.+)$/gm;
+
+        content = content.replace(listPattern, '{{LIST}}$1{{/LIST}}');
+        content = content.replace(numberedListPattern, '{{NUMLIST}}$1{{/NUMLIST}}');
+
+        content = content.replace(/\n{2,}({{LIST}})/g, '\n\n$1');
+        content = content.replace(/({{\/LIST}})\n{2,}/g, '$1\n\n');
+
+        content = content.replace(/{{LIST}}/g, '').replace(/{{\/LIST}}/g, '');
+        content = content.replace(/{{NUMLIST}}/g, '').replace(/{{\/NUMLIST}}/g, '');
+
+        return content;
+    }
+
+    preserveCodeBlocks(content) {
+        const codeBlockRegex = /```[\s\S]*?```/g;
+        const codeBlocks = [];
+        let index = 0;
+
+        content = content.replace(codeBlockRegex, (match) => {
+            codeBlocks.push(match);
+            return `{{CODEBLOCK_${index++}}}`;
         });
 
-        wrapper.innerHTML = wrapper.innerHTML.replace(/(<br\s*\/?>\s*){2,}/g, '<br>');
+        const inlineCodeRegex = /`[^`]+`/g;
+        const inlineCodes = [];
+        let inlineIndex = 0;
 
-        return wrapper.innerHTML.trim();
+        content = content.replace(inlineCodeRegex, (match) => {
+            inlineCodes.push(match);
+            return `{{INLINECODE_${inlineIndex++}}}`;
+        });
+
+        content = content.replace(/\n{3,}/g, '\n\n');
+
+        for (let i = 0; i < codeBlocks.length; i++) {
+            content = content.replace(`{{CODEBLOCK_${i}}}`, codeBlocks[i]);
+        }
+
+        for (let i = 0; i < inlineCodes.length; i++) {
+            content = content.replace(`{{INLINECODE_${i}}}`, inlineCodes[i]);
+        }
+
+        return content;
+    }
+
+    postProcessHTML(html) {
+        if (!html) return '';
+
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        // Nettoyer les paragraphes vides
+        temp.querySelectorAll('p').forEach(p => {
+            if (!p.textContent.trim() && !p.querySelector('img')) {
+                p.remove();
+            }
+        });
+
+        // Nettoyer les doubles <br>
+        temp.innerHTML = temp.innerHTML.replace(/(<br\s*\/?>){2,}/gi, '<br>');
+
+        // Améliorer les listes
+        temp.querySelectorAll('ul, ol').forEach(list => {
+            list.classList.add('formatted-list');
+            list.querySelectorAll('li').forEach(li => {
+                if (li.children.length === 1 && li.firstElementChild.tagName === 'P') {
+                    li.innerHTML = li.firstElementChild.innerHTML;
+                }
+            });
+        });
+
+        // Améliorer les blocs de code
+        temp.querySelectorAll('pre').forEach(pre => {
+            pre.classList.add('formatted-code');
+            if (pre.firstElementChild && pre.firstElementChild.tagName === 'CODE') {
+                pre.firstElementChild.textContent = pre.firstElementChild.textContent.trim();
+            }
+        });
+
+        let finalHTML = temp.innerHTML;
+        finalHTML = finalHTML.replace(/>\s+</g, '><');
+        finalHTML = finalHTML.replace(/<\/(p|div|blockquote|h[1-6])>/gi, '</$1>\n');
+        finalHTML = finalHTML.replace(/<(p|div|blockquote|h[1-6])/gi, '\n<$1');
+        finalHTML = finalHTML.replace(/\n{3,}/g, '\n\n');
+
+        return finalHTML.trim();
     }
 
     finishStreaming(messageElement, content) {
