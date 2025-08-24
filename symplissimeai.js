@@ -17,6 +17,7 @@ class SymplissimeAIApp {
         this.streamingInterval = null;
         this.currentTheme = 'symplissime';
         this.currentFont = 'inter';
+        this.stampClass = 'symplissime-stamp';
 
         this.themes = {
             'symplissime': {
@@ -171,7 +172,7 @@ class SymplissimeAIApp {
 
     addPromptSuggestion(text, save = true) {
         const datalist = document.getElementById('promptSuggestions');
-        if (!datalist || !text) return;
+        if (!text) return;
         const exists = Array.from(datalist.options).some(opt => opt.value === text);
         if (!exists) {
             const option = document.createElement('option');
@@ -186,8 +187,7 @@ class SymplissimeAIApp {
 
     createThemeSelector() {
         const themeToggle = document.getElementById('themeToggle');
-        if (!themeToggle) return;
-        
+
         // Modifier le bouton pour afficher le thème actuel
         themeToggle.innerHTML = this.themes[this.currentTheme].icon;
         
@@ -244,17 +244,13 @@ class SymplissimeAIApp {
 
     toggleThemeDropdown() {
         const dropdown = document.getElementById('themeDropdown');
-        if (dropdown) {
-            this.hideFontDropdown();
-            dropdown.classList.toggle('show');
-        }
+        this.hideFontDropdown();
+        dropdown.classList.toggle('show');
     }
 
     hideThemeDropdown() {
         const dropdown = document.getElementById('themeDropdown');
-        if (dropdown) {
-            dropdown.classList.remove('show');
-        }
+        dropdown.classList.remove('show');
     }
 
     selectTheme(themeKey) {
@@ -264,9 +260,7 @@ class SymplissimeAIApp {
             
             // Mettre à jour l'icône du bouton
             const themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                themeToggle.innerHTML = this.themes[themeKey].icon;
-            }
+            themeToggle.innerHTML = this.themes[themeKey].icon;
             
             // Mettre à jour les options actives
             document.querySelectorAll('.theme-option').forEach(option => {
@@ -312,7 +306,6 @@ class SymplissimeAIApp {
 
     createFontSelector() {
         const fontToggle = document.getElementById('fontToggle');
-        if (!fontToggle) return;
 
         const fontSelector = document.createElement('div');
         fontSelector.className = 'font-selector';
@@ -358,17 +351,13 @@ class SymplissimeAIApp {
 
     toggleFontDropdown() {
         const dropdown = document.getElementById('fontDropdown');
-        if (dropdown) {
-            this.hideThemeDropdown();
-            dropdown.classList.toggle('show');
-        }
+        this.hideThemeDropdown();
+        dropdown.classList.toggle('show');
     }
 
     hideFontDropdown() {
         const dropdown = document.getElementById('fontDropdown');
-        if (dropdown) {
-            dropdown.classList.remove('show');
-        }
+        dropdown.classList.remove('show');
     }
 
     selectFont(fontKey) {
@@ -404,7 +393,6 @@ class SymplissimeAIApp {
 
     initParallax() {
         const header = document.querySelector('.chat-header');
-        if (!header) return;
         window.addEventListener('scroll', () => {
             const offset = window.scrollY * 0.1;
             header.style.transform = `translateZ(${offset}px)`;
@@ -414,14 +402,10 @@ class SymplissimeAIApp {
     bindEvents() {
         // Événement de soumission du formulaire
         const chatForm = document.getElementById('chatForm');
-        if (chatForm) {
-            chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
-        }
+        chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
 
         const chatMessages = document.getElementById('chatMessages');
-        if (chatMessages) {
-            chatMessages.addEventListener('scroll', () => this.updateScrollIndicator());
-        }
+        chatMessages.addEventListener('scroll', () => this.updateScrollIndicator());
 
         // Animations et ripple sur les boutons
         document.querySelectorAll('.control-btn, .send-button').forEach(btn => {
@@ -578,11 +562,9 @@ class SymplissimeAIApp {
 
     async sendMessage(message) {
         const sendButton = document.getElementById('sendButton');
-        const originalText = sendButton ? sendButton.textContent : '';
-        if (sendButton) {
-            sendButton.classList.add('sending');
-            sendButton.textContent = 'Envoi...';
-        }
+        const originalText = sendButton.textContent;
+        sendButton.classList.add('sending');
+        sendButton.textContent = 'Envoi...';
 
         this.addMessage(message, true);
         this.placeholderMessage = this.createPlaceholderMessage();
@@ -619,10 +601,8 @@ class SymplissimeAIApp {
                 this.showToast('Erreur lors de la communication', 'error');
                 this.stopProgressSimulation();
                 this.setProcessingState(false);
-                if (sendButton) {
-                    sendButton.classList.remove('sending');
-                    sendButton.textContent = originalText;
-                }
+                sendButton.classList.remove('sending');
+                sendButton.textContent = originalText;
             } else if (data.success && data.message) {
                 await this.streamMessage(data.message);
             } else {
@@ -634,10 +614,8 @@ class SymplissimeAIApp {
                 this.updateStatus('error', 'Pas de réponse');
                 this.stopProgressSimulation();
                 this.setProcessingState(false);
-                if (sendButton) {
-                    sendButton.classList.remove('sending');
-                    sendButton.textContent = originalText;
-                }
+                sendButton.classList.remove('sending');
+                sendButton.textContent = originalText;
             }
         } catch (error) {
             console.error('Erreur de communication:', error);
@@ -651,10 +629,8 @@ class SymplissimeAIApp {
             this.showToast('Problème de connexion', 'error');
             this.stopProgressSimulation();
             this.setProcessingState(false);
-            if (sendButton) {
-                sendButton.classList.remove('sending');
-                sendButton.textContent = originalText;
-            }
+            sendButton.classList.remove('sending');
+            sendButton.textContent = originalText;
         }
     }
 
@@ -704,7 +680,6 @@ class SymplissimeAIApp {
 
     createMessageElement(content, isUser = false, isError = false) {
         const chatMessages = document.getElementById('chatMessages');
-        if (!chatMessages) return null;
 
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'} fade-in`;
@@ -916,51 +891,41 @@ class SymplissimeAIApp {
     }
 
     applyGradientToHeadings(root) {
-        if (!root) return;
-        const headings = root.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        const headings = root.querySelectorAll(`h1:not(.${this.stampClass}), h2:not(.${this.stampClass}), h3:not(.${this.stampClass}), h4:not(.${this.stampClass}), h5:not(.${this.stampClass}), h6:not(.${this.stampClass})`);
         headings.forEach(h => {
             const level = parseInt(h.tagName.replace('H', ''), 10);
-            h.classList.add('gradient-title', 'formatted-title', `title-level-${level}`);
+            h.classList.add('gradient-title', 'formatted-title', `title-level-${level}`, this.stampClass);
         });
-
-        // Vérification post-traitement : tous les titres doivent avoir la classe gradient-title
-        const missing = Array.from(headings).filter(h => !h.classList.contains('gradient-title'));
-        if (missing.length) {
-            console.warn('Titres sans classe gradient détectés, correction appliquée.');
-            missing.forEach(h => {
-                const level = parseInt(h.tagName.replace('H', ''), 10);
-                h.classList.add('gradient-title', 'formatted-title', `title-level-${level}`);
-            });
-        }
     }
 
     validateFormatting(root) {
-        // Vérifie et applique les classes CSS obligatoires
-        if (!root) return;
-
         this.applyGradientToHeadings(root);
 
-        root.querySelectorAll('p').forEach(p => {
+        root.querySelectorAll(`p:not(.${this.stampClass})`).forEach(p => {
             if (!p.textContent.trim() && !p.querySelector('img')) {
                 p.remove();
             } else {
-                p.classList.add('formatted-paragraph');
+                p.classList.add('formatted-paragraph', this.stampClass);
             }
         });
 
-        root.querySelectorAll('ul, ol').forEach(list => {
-            list.classList.add('formatted-list');
+        root.querySelectorAll(`ul:not(.${this.stampClass}), ol:not(.${this.stampClass})`).forEach(list => {
+            list.classList.add('formatted-list', this.stampClass);
             if (!list.querySelectorAll('li').length) {
                 list.remove();
             }
         });
 
-        root.querySelectorAll('pre').forEach(pre => {
-            pre.classList.add('formatted-code');
+        root.querySelectorAll(`pre:not(.${this.stampClass})`).forEach(pre => {
+            pre.classList.add('formatted-code', this.stampClass);
         });
 
         // Supprimer les doublons de <br>
         root.querySelectorAll('br + br').forEach(br => br.remove());
+    }
+
+    finalNormalize(root = document.body) {
+        this.validateFormatting(root);
     }
 
     postProcessHTML(html) {
@@ -997,9 +962,6 @@ class SymplissimeAIApp {
             }
         });
 
-        // Appliquer systématiquement les classes de titres
-        this.applyGradientToHeadings(temp);
-
         // Améliorer les blocs de code
         temp.querySelectorAll('pre').forEach(pre => {
             pre.classList.add('formatted-code');
@@ -1007,6 +969,9 @@ class SymplissimeAIApp {
                 pre.firstElementChild.textContent = pre.firstElementChild.textContent.trim();
             }
         });
+
+        // Normalisation finale avec estampillage
+        this.finalNormalize(temp);
 
         let finalHTML = temp.innerHTML;
         finalHTML = this.normalizeLineBreaks(finalHTML);
@@ -1040,12 +1005,11 @@ class SymplissimeAIApp {
         this.stopProgressSimulation();
         this.setProcessingState(false);
         const sendButton = document.getElementById('sendButton');
-        if (sendButton) {
-            sendButton.classList.remove('sending');
-            sendButton.textContent = 'Envoyer';
-        }
+        sendButton.classList.remove('sending');
+        sendButton.textContent = 'Envoyer';
         this.updateStatus('done', 'Terminé', 100);
         setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
+        this.finalNormalize();
     }
 
     setProcessingState(processing) {
@@ -1053,13 +1017,8 @@ class SymplissimeAIApp {
         const messageInput = this.getMessageInput();
         const sendButton = document.getElementById('sendButton');
 
-        if (messageInput) {
-            messageInput.disabled = processing;
-        }
-
-        if (sendButton) {
-            sendButton.disabled = processing;
-        }
+        messageInput.disabled = processing;
+        sendButton.disabled = processing;
 
         document.querySelectorAll('.avatar.bot').forEach(avatar => {
             avatar.classList.toggle('processing', processing);
@@ -1094,6 +1053,7 @@ class SymplissimeAIApp {
         }
 
         this.scrollToBottom();
+        this.finalNormalize();
     }
 
     createMessageActions(content) {
@@ -1311,7 +1271,6 @@ class SymplissimeAIApp {
     }
     cameleonMode() {
         const container = document.getElementById('chatContainer');
-        if (!container) return;
         container.classList.add('cameleon-mode');
         const mascot = document.createElement('div');
         mascot.className = 'cameleon-mascot';
@@ -1325,7 +1284,6 @@ class SymplissimeAIApp {
 
     showTyping() {
         const chatMessages = document.getElementById('chatMessages');
-        if (!chatMessages) return;
 
         // Supprimer l'indicateur existant s'il y en a un
         this.hideTyping();
@@ -1379,8 +1337,6 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
         const statusText = document.getElementById('statusText');
         const statusProgress = document.getElementById('statusProgress');
 
-        if (!statusDot || !statusText || !statusProgress) return;
-
         statusDot.className = 'status-dot';
         switch (state) {
             case 'connected':
@@ -1407,18 +1363,15 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
     scrollToBottom() {
         const chatMessages = document.getElementById('chatMessages');
-        if (chatMessages) {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                this.updateScrollIndicator();
-            }, 50);
-        }
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            this.updateScrollIndicator();
+        }, 50);
     }
 
     updateScrollIndicator() {
         const chatMessages = document.getElementById('chatMessages');
         const progress = document.getElementById('scrollProgress');
-        if (!chatMessages || !progress) return;
         const { scrollTop, scrollHeight, clientHeight } = chatMessages;
         const percent = scrollHeight > clientHeight ? (scrollTop / (scrollHeight - clientHeight)) * 100 : 0;
         progress.style.width = `${percent}%`;
@@ -1493,12 +1446,10 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
 
     showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
-        if (!toast) return;
-
         toast.textContent = message;
         toast.className = `toast ${type}`;
         toast.classList.add('show');
-        
+
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
@@ -1573,13 +1524,11 @@ Généré le: ${new Date().toLocaleString('fr-FR')}
             }
             
             const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages) {
-                chatMessages.querySelectorAll('.message-wrapper').forEach(msg => msg.classList.add('fade-out'));
-                setTimeout(() => {
-                    chatMessages.innerHTML = '';
-                    this.showWelcomeMessage();
-                }, 300);
-            }
+            chatMessages.querySelectorAll('.message-wrapper').forEach(msg => msg.classList.add('fade-out'));
+            setTimeout(() => {
+                chatMessages.innerHTML = '';
+                this.showWelcomeMessage();
+            }, 300);
             this.messageHistory = [];
             this.showToast('Historique effacé', 'success');
         }
@@ -1591,6 +1540,7 @@ let symplissimeApp;
 
 document.addEventListener('DOMContentLoaded', function() {
     symplissimeApp = new SymplissimeAIApp();
+    symplissimeApp.finalNormalize();
 });
 
 // Exposition globale pour les boutons HTML
