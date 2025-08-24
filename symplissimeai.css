@@ -253,6 +253,7 @@ body {
   -webkit-text-size-adjust: 100%;
   font-size: calc(16px * var(--font-scale));
   line-height: 1.6;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
 /* Sélecteur de thème */
@@ -589,11 +590,6 @@ body {
   font-size: 11px;
   font-weight: 600;
   font-variation-settings: "wght" 600;
-  background: linear-gradient(90deg, var(--c-pri-light), var(--c-pri));
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
   transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
   text-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
@@ -603,6 +599,16 @@ body {
   font-variation-settings: "wght" 700;
   letter-spacing: 0.5px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.gradient-title {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--c-pri-light), var(--c-pri));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
 /* CONTROLS PANEL */
