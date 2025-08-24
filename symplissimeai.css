@@ -578,7 +578,9 @@ body {
   right: -12px;
   font-size: 8px;
   background: linear-gradient(135deg, var(--c-pri), var(--c-pri-light));
+  background-clip: text;
   -webkit-background-clip: text;
+  color: transparent;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
 }
@@ -588,8 +590,10 @@ body {
   font-weight: 600;
   font-variation-settings: "wght" 600;
   background: linear-gradient(90deg, var(--c-pri-light), var(--c-pri));
+  background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
   transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
   text-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
@@ -789,7 +793,9 @@ body {
   letter-spacing: -0.5px;
   margin-bottom: 4px;
   background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  background-clip: text;
   -webkit-background-clip: text;
+  color: transparent;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1471,8 +1477,10 @@ body {
 .message h2,
 .message h3 {
     background: linear-gradient(90deg, var(--c-pri), var(--c-pri-light));
+    background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+    -webkit-text-fill-color: transparent;
     font-variation-settings: "wght" 600;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
     transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
