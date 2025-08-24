@@ -567,20 +567,23 @@ class SymplissimeAIApp {
         // Convertir le contenu en HTML sécurisé et nettoyé avant le streaming
         const html = this.generateHTML(content);
 
-        // Variables pour le streaming par blocs
-        const totalChars = html.length;
+        // Parse le HTML en nœuds DOM complets pour éviter les balises non fermées
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const tokens = Array.from(doc.body.childNodes);
+        const totalTokens = tokens.length;
         let currentIndex = 0;
-        const chunkSize = 15; // nombre de caractères affichés à chaque tick
 
-        const streamNextChunk = () => {
-            if (currentIndex < totalChars) {
-                currentIndex = Math.min(currentIndex + chunkSize, totalChars);
-                messageContentDiv.innerHTML = html.slice(0, currentIndex);
+        const streamNextToken = () => {
+            if (currentIndex < totalTokens) {
+                const fragment = document.createDocumentFragment();
+                fragment.appendChild(tokens[currentIndex].cloneNode(true));
+                messageContentDiv.appendChild(fragment);
                 this.scrollToBottom();
-                const progress = Math.round((currentIndex / totalChars) * 100);
+                const progress = Math.round(((currentIndex + 1) / totalTokens) * 100);
                 this.updateStatus('processing', 'Réponse en cours', progress);
-                // Affichage quasi instantané
-                this.streamingInterval = setTimeout(streamNextChunk, 0);
+                this.streamingInterval = setTimeout(streamNextToken, 0);
+                currentIndex++;
             } else {
                 // Streaming terminé
                 this.finishStreaming(messageElement, content);
@@ -588,7 +591,7 @@ class SymplissimeAIApp {
         };
 
         // Démarrer le streaming
-        streamNextChunk();
+        streamNextToken();
     }
 
     createMessageElement(content, isUser = false, isError = false) {
