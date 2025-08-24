@@ -258,10 +258,10 @@ class SymplissimeAIApp {
         }
         
         // Animation fluide de transition
-        document.body.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        document.body.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
         setTimeout(() => {
             document.body.style.transition = '';
-        }, 300);
+        }, 600);
     }
 
     toggleTheme() {
