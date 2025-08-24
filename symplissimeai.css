@@ -737,7 +737,8 @@ body {
   align-items: center;
   color: white;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 10;
   transform-style: preserve-3d;
   transition: transform 0.3s ease;
 }
