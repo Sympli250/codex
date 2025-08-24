@@ -641,22 +641,15 @@ class SymplissimeAIApp {
     renderMarkdown(element, content) {
         if (!element) return;
 
-        const html = this.generateHTML(content);
-        element.innerHTML = html;
+        element.innerHTML = this.generateHTML(content);
 
-        if (window.hljs) {
+        if (window.hljs && typeof window.hljs.highlightElement === 'function') {
             element.querySelectorAll('pre code').forEach(block => {
-                hljs.highlightElement(block);
+                window.hljs.highlightElement(block);
             });
+        } else if (!window.hljs) {
+            console.warn('Highlight.js est absent, coloration ignorée.');
         }
-
-        element.querySelectorAll('p').forEach(p => {
-            p.classList.add('formatted-paragraph');
-        });
-
-        element.querySelectorAll('ul, ol').forEach(list => {
-            list.classList.add('formatted-list');
-        });
     }
 
     generateHTML(content) {
@@ -807,14 +800,7 @@ class SymplissimeAIApp {
 
     finishStreaming(messageElement, content) {
         const messageDiv = messageElement.querySelector('.message');
-        // Appliquer la coloration syntaxique après insertion complète si hljs est disponible
-        if (window.hljs && typeof window.hljs.highlightElement === 'function') {
-            messageDiv.querySelectorAll('pre code').forEach(block => {
-                window.hljs.highlightElement(block);
-            });
-        } else {
-            console.warn('Highlight.js est absent, coloration ignorée.');
-        }
+        this.renderMarkdown(messageDiv, content);
 
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser: false, isError: false, timestamp: new Date() });
