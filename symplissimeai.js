@@ -673,7 +673,7 @@ class SymplissimeAIApp {
         }
 
         // Convertir le contenu en HTML sécurisé et nettoyé avant le streaming
-        const html = this.generateHTML(content);
+        const html = this.processMarkdown(content);
 
         // Parse le HTML en nœuds DOM complets pour éviter les balises non fermées
         const parser = new DOMParser();
@@ -757,35 +757,32 @@ class SymplissimeAIApp {
         return messageElement;
     }
 
-    renderMarkdown(element, content) {
-        // Render Markdown/HTML content inside a DOM element with final validation
-        if (!element) return;
+    processMarkdown(content, element = null) {
+        // Fonction maîtresse : nettoyage -> parsing Markdown -> sanitisation -> post-processing DOM -> validation
+        let processed = '';
 
-        element.innerHTML = this.generateHTML(content);
-        // S'assure que les classes de formatage sont bien présentes
-        this.validateFormatting(element);
-
-        if (window.hljs && typeof window.hljs.highlightElement === 'function') {
-            element.querySelectorAll('pre code').forEach(block => {
-                window.hljs.highlightElement(block);
-            });
-        } else if (!window.hljs) {
-            console.warn('Highlight.js est absent, coloration ignorée.');
-        }
-    }
-
-    generateHTML(content) {
-        // Pipeline unifié pour produire un HTML fiable à partir de Markdown
+        // 1. Nettoyage strict du contenu brut
         try {
-            // 1. Nettoyage strict du contenu brut
-            let processed = this.cleanRawContent(content);
+            processed = this.cleanRawContent(content || '');
+            if (typeof processed !== 'string') throw new Error('Nettoyage invalide');
+        } catch (e) {
+            console.error('Échec nettoyage:', e);
+            processed = '';
+        }
 
-            // 2. Conversion Markdown -> HTML
+        // 2. Conversion Markdown -> HTML
+        try {
             if (window.marked && typeof window.marked.parse === 'function') {
                 processed = window.marked.parse(processed);
             }
+            if (typeof processed !== 'string') throw new Error('Parsing Markdown invalide');
+        } catch (e) {
+            console.error('Échec parsing Markdown:', e);
+            processed = '';
+        }
 
-            // 3. Sanitization DOMPurify
+        // 3. Sanitisation via DOMPurify
+        try {
             if (window.DOMPurify) {
                 processed = window.DOMPurify.sanitize(processed, {
                     ALLOWED_TAGS: [
@@ -798,13 +795,44 @@ class SymplissimeAIApp {
                     KEEP_CONTENT: true
                 });
             }
-
-            // 4. Post-traitement DOM
-            return this.postProcessHTML(processed);
+            if (typeof processed !== 'string') throw new Error('Sanitisation invalide');
         } catch (e) {
-            console.error('Erreur de génération HTML:', e);
-            return '';
+            console.error('Échec sanitisation:', e);
+            processed = '';
         }
+
+        // 4. Post-traitement du HTML
+        try {
+            processed = this.postProcessHTML(processed);
+            if (typeof processed !== 'string') throw new Error('Post-traitement invalide');
+        } catch (e) {
+            console.error('Échec post-traitement DOM:', e);
+            processed = '';
+        }
+
+        // 5. Validation finale
+        const temp = document.createElement('div');
+        temp.innerHTML = processed;
+        try {
+            this.validateFormatting(temp);
+        } catch (e) {
+            console.error('Échec validation format:', e);
+        }
+        processed = temp.innerHTML;
+
+        // Rendu optionnel dans un élément DOM
+        if (element) {
+            element.innerHTML = processed;
+            if (window.hljs && typeof window.hljs.highlightElement === 'function') {
+                element.querySelectorAll('pre code').forEach(block => {
+                    window.hljs.highlightElement(block);
+                });
+            } else if (!window.hljs) {
+                console.warn('Highlight.js est absent, coloration ignorée.');
+            }
+        }
+
+        return processed;
     }
 
     normalizeLineBreaks(text) {
@@ -980,9 +1008,6 @@ class SymplissimeAIApp {
             }
         });
 
-        // Validation finale pour s'assurer que tout est formaté correctement
-        this.validateFormatting(temp);
-
         let finalHTML = temp.innerHTML;
         finalHTML = this.normalizeLineBreaks(finalHTML);
         finalHTML = finalHTML.replace(/<\/p>\s*\n{2,}\s*<p/g, '</p>\n<p');
@@ -993,7 +1018,7 @@ class SymplissimeAIApp {
 
     finishStreaming(messageElement, content) {
         const messageDiv = messageElement.querySelector('.message');
-        this.renderMarkdown(messageDiv, content);
+        this.processMarkdown(content, messageDiv);
 
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser: false, isError: false, timestamp: new Date() });
@@ -1055,7 +1080,7 @@ class SymplissimeAIApp {
         // Actions et rendu Markdown pour les messages du bot (non-erreur)
         if (!isUser && !isError) {
             const messageDiv = messageElement.querySelector('.message');
-            this.renderMarkdown(messageDiv, content);
+            this.processMarkdown(content, messageDiv);
 
             const messageContent = messageElement.querySelector('.message-content');
             const actions = this.createMessageActions(content);
