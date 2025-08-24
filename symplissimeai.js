@@ -689,11 +689,14 @@ class SymplissimeAIApp {
         // Normaliser les fins de ligne
         cleaned = cleaned.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
+        // Convertir les sauts de ligne HTML en nouvelles lignes pour unifier le traitement
+        cleaned = cleaned.replace(/<br\s*\/?>(\s*)/gi, '\n');
+
         // Supprimer les espaces en début et fin
         cleaned = cleaned.trim();
 
         // Réduire les multiples retours à la ligne consécutifs à maximum 2
-        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+        cleaned = cleaned.replace(/(\n\s*){3,}/g, '\n\n');
 
         // Nettoyer les espaces multiples sur une même ligne
         cleaned = cleaned.replace(/[^\S\n]{2,}/g, ' ');
@@ -753,6 +756,14 @@ class SymplissimeAIApp {
         return content;
     }
 
+    markImportantHeadings(root) {
+        if (!root) return;
+        root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+            const level = parseInt(h.tagName.replace('H', ''), 10);
+            h.classList.add('formatted-title', `title-level-${level}`);
+        });
+    }
+
     postProcessHTML(html) {
         if (!html) return '';
 
@@ -769,7 +780,7 @@ class SymplissimeAIApp {
         });
 
         // Nettoyer les doubles <br>
-        temp.innerHTML = temp.innerHTML.replace(/(<br\s*\/?>){2,}/gi, '<br>');
+        temp.innerHTML = temp.innerHTML.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');
 
         // Améliorer les listes
         temp.querySelectorAll('ul, ol').forEach(list => {
@@ -781,6 +792,9 @@ class SymplissimeAIApp {
             });
         });
 
+        // Identifier et marquer les titres importants
+        this.markImportantHeadings(temp);
+
         // Améliorer les blocs de code
         temp.querySelectorAll('pre').forEach(pre => {
             pre.classList.add('formatted-code');
@@ -789,12 +803,7 @@ class SymplissimeAIApp {
             }
         });
 
-        let finalHTML = temp.innerHTML;
-        finalHTML = finalHTML.replace(/>\s+</g, '><');
-        finalHTML = finalHTML.replace(/<\/(p|div|blockquote|h[1-6])>/gi, '</$1>\n');
-        finalHTML = finalHTML.replace(/<(p|div|blockquote|h[1-6])/gi, '\n<$1');
-        finalHTML = finalHTML.replace(/\n{3,}/g, '\n\n');
-
+        const finalHTML = temp.innerHTML.replace(/\n{3,}/g, '\n\n');
         return finalHTML.trim();
     }
 
