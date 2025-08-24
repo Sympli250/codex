@@ -599,14 +599,17 @@ class SymplissimeAIApp {
                 trimOnlySpaces: true
             }).result;
         }
+        processed = processed
+            .replace(/\r\n/g, '\n')
+            .replace(/\n{2,}/g, '\n');
         let html = marked.parse(processed);
         html = DOMPurify.sanitize(html);
         if (typeof htmlClean === 'function') {
             html = htmlClean(html);
         }
         html = html
+            .replace(/<p>\s*<\/p>/g, '')
             .replace(/(<br\s*\/?>\s*){2,}/g, '<br>')
-            .replace(/\n{2,}/g, '\n')
             .replace(/[\t ]{2,}/g, ' ');
         return html.trim();
     }
