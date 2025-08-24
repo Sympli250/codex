@@ -807,22 +807,28 @@ class SymplissimeAIApp {
         }
     }
 
+    normalizeLineBreaks(text) {
+        return text.replace(/\r\n|\r/g, '\n');
+    }
+
+    collapseLineBreaks(text) {
+        return text.replace(/\n{2,}/g, '\n\n');
+    }
+
+    compactSpacing(text) {
+        return this.collapseLineBreaks(text).replace(/[ \t]{2,}/g, ' ').trim();
+    }
+
     cleanRawContent(content) {
         if (!content) return '';
 
-        let cleaned = String(content);
-
-        // Normaliser toutes les fins de ligne
-        cleaned = cleaned.replace(/\r\n?/g, '\n');
+        let cleaned = this.normalizeLineBreaks(String(content));
 
         // Remplacer les séquences de <br> par une seule nouvelle ligne
         cleaned = cleaned.replace(/(<br\s*\/?>(\s*))+?/gi, '\n');
 
         // Supprimer les espaces en début ou fin de ligne
         cleaned = cleaned.replace(/[ \t]+\n/g, '\n').trim();
-
-        // Limiter les retours à la ligne consécutifs à deux maximum
-        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
 
         // Réduire les espaces multiples hors lignes
         cleaned = cleaned.replace(/[^\S\n]{2,}/g, ' ');
@@ -831,7 +837,8 @@ class SymplissimeAIApp {
         cleaned = this.preserveListStructure(cleaned);
         cleaned = this.preserveCodeBlocks(cleaned);
 
-        return cleaned;
+        // Compactage final des retours à la ligne
+        return this.collapseLineBreaks(cleaned);
     }
 
     preserveListStructure(content) {
@@ -868,8 +875,6 @@ class SymplissimeAIApp {
             inlineCodes.push(match);
             return `{{INLINECODE_${inlineIndex++}}}`;
         });
-
-        content = content.replace(/\n{3,}/g, '\n\n');
 
         for (let i = 0; i < codeBlocks.length; i++) {
             content = content.replace(`{{CODEBLOCK_${i}}}`, codeBlocks[i]);
@@ -978,10 +983,12 @@ class SymplissimeAIApp {
         // Validation finale pour s'assurer que tout est formaté correctement
         this.validateFormatting(temp);
 
-        let finalHTML = temp.innerHTML.replace(/\n{3,}/g, '\n\n');
+        let finalHTML = temp.innerHTML;
+        finalHTML = this.normalizeLineBreaks(finalHTML);
         finalHTML = finalHTML.replace(/<\/p>\s*\n{2,}\s*<p/g, '</p>\n<p');
+        finalHTML = this.compactSpacing(finalHTML);
 
-        return finalHTML.trim();
+        return finalHTML;
     }
 
     finishStreaming(messageElement, content) {
