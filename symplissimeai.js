@@ -365,9 +365,10 @@ class SymplissimeAIApp {
             chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
 
-        // Animations des boutons
+        // Animations et ripple sur les boutons
         document.querySelectorAll('.control-btn, .send-button').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                this.createRipple(btn, e);
                 btn.classList.add('bounce');
                 btn.addEventListener('animationend', () => btn.classList.remove('bounce'), { once: true });
             });
@@ -383,6 +384,20 @@ class SymplissimeAIApp {
                 e.returnValue = '';
             }
         });
+    }
+
+    // Crée un effet ripple basé sur la position du clic
+    createRipple(btn, e) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
     }
 
     handleKeyboardShortcuts(e) {
