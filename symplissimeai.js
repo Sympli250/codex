@@ -633,7 +633,7 @@ class SymplissimeAIApp {
                     'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a', 'img', 'table',
                     'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'span', 'div'
                 ],
-                ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target'],
+                ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'start', 'value'],
                 ALLOW_DATA_ATTR: false,
                 KEEP_CONTENT: true
             });
