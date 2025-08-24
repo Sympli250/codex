@@ -85,9 +85,7 @@ class SymplissimeAIApp {
     }
 
     init() {
-        if (window.marked) {
-            marked.setOptions({ breaks: true });
-        }
+        this.configureMarkdown();
 
         this.loadSavedPreferences();
         this.loadPromptSuggestions();
@@ -98,6 +96,22 @@ class SymplissimeAIApp {
         this.createThemeSelector();
         this.createFontSelector();
         this.initParallax();
+    }
+
+    configureMarkdown() {
+        if (window.marked) {
+            marked.setOptions({
+                breaks: false, // Consistent line break handling
+                gfm: true,
+                headerIds: false,
+                mangle: false,
+                pedantic: false,
+                sanitize: false,
+                smartLists: true,
+                smartypants: true,
+                xhtml: false
+            });
+        }
     }
 
     loadSavedPreferences() {
@@ -646,20 +660,8 @@ class SymplissimeAIApp {
         // 1. Nettoyer le contenu brut avant tout traitement
         let processed = this.cleanRawContent(content);
 
-        // 2. Configurer marked pour un meilleur rendu
+        // 2. Parser le contenu Markdown avec la configuration globale
         if (window.marked) {
-            marked.setOptions({
-                breaks: false, // IMPORTANT: false pour éviter les doubles breaks
-                gfm: true,
-                headerIds: false,
-                mangle: false,
-                pedantic: false,
-                sanitize: false,
-                smartLists: true,
-                smartypants: true,
-                xhtml: false
-            });
-
             processed = marked.parse(processed);
         }
 
