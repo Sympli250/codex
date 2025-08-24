@@ -758,9 +758,12 @@ class SymplissimeAIApp {
     }
 
     renderMarkdown(element, content) {
+        // Render Markdown/HTML content inside a DOM element with final validation
         if (!element) return;
 
         element.innerHTML = this.generateHTML(content);
+        // S'assure que les classes de formatage sont bien présentes
+        this.validateFormatting(element);
 
         if (window.hljs && typeof window.hljs.highlightElement === 'function') {
             element.querySelectorAll('pre code').forEach(block => {
@@ -772,55 +775,59 @@ class SymplissimeAIApp {
     }
 
     generateHTML(content) {
-        // 1. Nettoyer le contenu brut avant tout traitement
-        let processed = this.cleanRawContent(content);
+        // Pipeline unifié pour produire un HTML fiable à partir de Markdown
+        try {
+            // 1. Nettoyage strict du contenu brut
+            let processed = this.cleanRawContent(content);
 
-        // 2. Parser le contenu Markdown avec la configuration globale
-        if (window.marked) {
-            processed = marked.parse(processed);
+            // 2. Conversion Markdown -> HTML
+            if (window.marked && typeof window.marked.parse === 'function') {
+                processed = window.marked.parse(processed);
+            }
+
+            // 3. Sanitization DOMPurify
+            if (window.DOMPurify) {
+                processed = window.DOMPurify.sanitize(processed, {
+                    ALLOWED_TAGS: [
+                        'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                        'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a', 'img', 'table',
+                        'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'span', 'div'
+                    ],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'start', 'value'],
+                    ALLOW_DATA_ATTR: false,
+                    KEEP_CONTENT: true
+                });
+            }
+
+            // 4. Post-traitement DOM
+            return this.postProcessHTML(processed);
+        } catch (e) {
+            console.error('Erreur de génération HTML:', e);
+            return '';
         }
-
-        // 3. Nettoyer et sanitizer le HTML
-        if (window.DOMPurify) {
-            processed = DOMPurify.sanitize(processed, {
-                ALLOWED_TAGS: [
-                    'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                    'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a', 'img', 'table',
-                    'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'span', 'div'
-                ],
-                ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'start', 'value'],
-                ALLOW_DATA_ATTR: false,
-                KEEP_CONTENT: true
-            });
-        }
-
-        // 4. Post-traitement du HTML
-        processed = this.postProcessHTML(processed);
-
-        return processed;
     }
 
     cleanRawContent(content) {
         if (!content) return '';
 
-        let cleaned = content;
+        let cleaned = String(content);
 
-        // Normaliser les fins de ligne
-        cleaned = cleaned.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        // Normaliser toutes les fins de ligne
+        cleaned = cleaned.replace(/\r\n?/g, '\n');
 
-        // Convertir les sauts de ligne HTML en nouvelles lignes pour unifier le traitement
-        cleaned = cleaned.replace(/<br\s*\/?>(\s*)/gi, '\n');
+        // Remplacer les séquences de <br> par une seule nouvelle ligne
+        cleaned = cleaned.replace(/(<br\s*\/?>(\s*))+?/gi, '\n');
 
-        // Supprimer les espaces en début et fin
-        cleaned = cleaned.trim();
+        // Supprimer les espaces en début ou fin de ligne
+        cleaned = cleaned.replace(/[ \t]+\n/g, '\n').trim();
 
-        // Réduire les multiples retours à la ligne consécutifs à maximum 2
-        cleaned = cleaned.replace(/(\n\s*){3,}/g, '\n\n');
+        // Limiter les retours à la ligne consécutifs à deux maximum
+        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
 
-        // Nettoyer les espaces multiples sur une même ligne
+        // Réduire les espaces multiples hors lignes
         cleaned = cleaned.replace(/[^\S\n]{2,}/g, ' ');
 
-        // Préserver la structure des listes et blocs de code
+        // Préserver la structure des listes et des blocs de code
         cleaned = this.preserveListStructure(cleaned);
         cleaned = this.preserveCodeBlocks(cleaned);
 
@@ -883,13 +890,45 @@ class SymplissimeAIApp {
         });
     }
 
+    validateFormatting(root) {
+        // Vérifie et applique les classes CSS obligatoires
+        if (!root) return;
+
+        root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+            const level = parseInt(h.tagName.replace('H', ''), 10);
+            h.classList.add('formatted-title', `title-level-${level}`);
+        });
+
+        root.querySelectorAll('p').forEach(p => {
+            if (!p.textContent.trim() && !p.querySelector('img')) {
+                p.remove();
+            } else {
+                p.classList.add('formatted-paragraph');
+            }
+        });
+
+        root.querySelectorAll('ul, ol').forEach(list => {
+            list.classList.add('formatted-list');
+            if (!list.querySelectorAll('li').length) {
+                list.remove();
+            }
+        });
+
+        root.querySelectorAll('pre').forEach(pre => {
+            pre.classList.add('formatted-code');
+        });
+
+        // Supprimer les doublons de <br>
+        root.querySelectorAll('br + br').forEach(br => br.remove());
+    }
+
     postProcessHTML(html) {
         if (!html) return '';
 
         const temp = document.createElement('div');
         temp.innerHTML = html;
 
-        // Nettoyer les paragraphes vides
+        // Nettoyer les paragraphes vides et appliquer les classes
         temp.querySelectorAll('p').forEach(p => {
             if (!p.textContent.trim() && !p.querySelector('img')) {
                 p.remove();
@@ -898,17 +937,23 @@ class SymplissimeAIApp {
             }
         });
 
-        // Nettoyer les doubles <br>
-        temp.innerHTML = temp.innerHTML.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');
+        // Suppression des <br> consécutifs
+        temp.querySelectorAll('br + br').forEach(br => br.remove());
 
-        // Améliorer les listes
+        // Amélioration des listes et suppression des éléments vides
         temp.querySelectorAll('ul, ol').forEach(list => {
             list.classList.add('formatted-list');
             list.querySelectorAll('li').forEach(li => {
                 if (li.children.length === 1 && li.firstElementChild.tagName === 'P') {
                     li.innerHTML = li.firstElementChild.innerHTML;
                 }
+                if (!li.textContent.trim() && !li.children.length) {
+                    li.remove();
+                }
             });
+            if (!list.querySelectorAll('li').length) {
+                list.remove();
+            }
         });
 
         // Identifier et marquer les titres importants
@@ -922,7 +967,12 @@ class SymplissimeAIApp {
             }
         });
 
-        const finalHTML = temp.innerHTML.replace(/\n{3,}/g, '\n\n');
+        // Validation finale pour s'assurer que tout est formaté correctement
+        this.validateFormatting(temp);
+
+        let finalHTML = temp.innerHTML.replace(/\n{3,}/g, '\n\n');
+        finalHTML = finalHTML.replace(/<\/p>\s*\n{2,}\s*<p/g, '</p>\n<p');
+
         return finalHTML.trim();
     }
 
