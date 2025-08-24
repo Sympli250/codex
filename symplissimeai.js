@@ -695,9 +695,10 @@ class SymplissimeAIApp {
         up.textContent = '👍';
         up.onclick = () => {
             this.showToast('Merci pour votre retour!');
+            this.launchConfetti();
             setTimeout(() => {
                 this.addMessage(
-                    "Nous serions ravis d'avoir votre avis sur [Trustpilot](https://fr.trustpilot.com/)",
+                    "Nous serions ravis d'avoir votre avis sur [Trustpilot](https://fr.trustpilot.com/review/symplissime.fr)",
                     false
                 );
             }, 500);
@@ -705,7 +706,15 @@ class SymplissimeAIApp {
         const down = document.createElement('span');
         down.className = 'thumb thumb-down';
         down.textContent = '👎';
-        down.onclick = () => this.showToast('Merci pour votre retour!');
+        down.onclick = () => {
+            this.showToast('Merci pour votre retour!');
+            setTimeout(() => {
+                this.addMessage(
+                    'Comment pouvons-nous améliorer cette réponse ?',
+                    false
+                );
+            }, 500);
+        };
         feedback.appendChild(up);
         feedback.appendChild(down);
 
