@@ -1282,17 +1282,20 @@ body {
 
 .toast.success {
   border-color: var(--c-pri-light);
-  background: linear-gradient(135deg, rgba(161, 212, 75, 0.1) 0%, rgba(161, 212, 75, 0.05) 100%);
+  background-color: var(--fluent-background-component);
+  background-image: linear-gradient(135deg, rgba(161, 212, 75, 0.2) 0%, rgba(161, 212, 75, 0.1) 100%);
 }
 
 .toast.error {
   border-color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  background-color: var(--fluent-background-component);
+  background-image: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
 }
 
 .toast.warning {
   border-color: #f59e0b;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+  background-color: var(--fluent-background-component);
+  background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
 }
 
 /* RESPONSIVE */
