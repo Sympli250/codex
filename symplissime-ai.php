@@ -7,6 +7,12 @@ $API_KEY = 'DV90GFR-8YR4RW2-G9BMCQ9-9X96PW5';
 $DEFAULT_WORKSPACE = 'support-windows';
 $CURRENT_USER = 'symplissime-backoffice';
 
+// Utilitaire pour ajouter un paramètre de version afin d'éviter la mise en cache
+function nocache_url($url) {
+    $separator = strpos($url, '?') === false ? '?' : '&';
+    return $url . $separator . 'v=' . time();
+}
+
 // Handle chat requests
 if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     header('Content-Type: application/json');
@@ -167,9 +173,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
             API_KEY: '<?php echo $API_KEY; ?>'
         };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-    <script src="symplissimeai.js"></script>
+    <script src="<?php echo nocache_url('https://cdn.jsdelivr.net/npm/marked/marked.min.js'); ?>"></script>
+    <script src="<?php echo nocache_url('https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js'); ?>"></script>
+    <script src="<?php echo nocache_url('https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js'); ?>"></script>
+    <script src="<?php echo nocache_url('symplissimeai.js'); ?>"></script>
 </body>
 </html>
