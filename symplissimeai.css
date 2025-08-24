@@ -1007,6 +1007,16 @@ body {
   color: white;
 }
 
+.avatar.bot.processing {
+  animation: avatarThinking 2s ease-in-out infinite;
+}
+
+@keyframes avatarThinking {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-2deg); }
+  75% { transform: scale(1.05) rotate(2deg); }
+}
+
 .message-content {
   flex: 1;
   max-width: 100%;
@@ -1027,6 +1037,27 @@ body {
   /* Améliore la lisibilité du texte */
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   animation: breathe 6s ease-in-out infinite;
+}
+
+.message-skeleton {
+  background: linear-gradient(90deg,
+    var(--fluent-background-light) 25%,
+    var(--fluent-hover-background) 50%,
+    var(--fluent-background-light) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  height: 1.2em;
+  margin-bottom: 0.5em;
+}
+
+.message-skeleton:last-child {
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .message.user {
@@ -1223,6 +1254,23 @@ body {
   box-shadow: var(--fluent-shadow-sm);
   position: relative;
   overflow: hidden;
+}
+
+.send-button.sending {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  cursor: not-allowed;
+}
+
+.send-button.sending::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  display: inline-block;
 }
 
 .send-button:hover:not(:disabled) {

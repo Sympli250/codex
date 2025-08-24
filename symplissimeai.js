@@ -79,6 +79,29 @@ class SymplissimeAIApp {
             }
         };
 
+        this.statusMessages = {
+            analysis: [
+                "Analyse de votre demande...",
+                "Compréhension du contexte...",
+                "Identification des solutions..."
+            ],
+            processing: [
+                "Recherche des meilleures réponses...",
+                "Consultation de la base de connaissances...",
+                "Préparation d'une réponse détaillée..."
+            ],
+            finalizing: [
+                "Finalisation de la réponse...",
+                "Vérification de la cohérence...",
+                "Mise en forme du contenu..."
+            ]
+        };
+
+        this.simulatedProgress = 0;
+        this.progressInterval = null;
+        this.processingStartTime = null;
+        this.placeholderMessage = null;
+
         this.easterEggs = ['/confettis','/darkflip','/fortune','/matrix','/cameleon','/eastereggs'];
         
         this.init();
@@ -513,56 +536,141 @@ class SymplissimeAIApp {
         }
     }
 
+    getProgressiveStatusMessage(elapsedTime = null) {
+        const elapsed = elapsedTime != null ? elapsedTime : (Date.now() - (this.processingStartTime || Date.now())) / 1000;
+        let phase = 'finalizing';
+        if (elapsed < 3) {
+            phase = 'analysis';
+        } else if (elapsed < 8) {
+            phase = 'processing';
+        }
+        const messages = this.statusMessages[phase];
+        const index = Math.floor(elapsed) % messages.length;
+        return messages[index];
+    }
+
+    startProgressSimulation() {
+        this.simulatedProgress = 0;
+        this.progressInterval = setInterval(() => {
+            if (this.simulatedProgress < 30) {
+                this.simulatedProgress += Math.random() * 5 + 2;
+            } else if (this.simulatedProgress < 70) {
+                this.simulatedProgress += Math.random() * 2 + 0.5;
+            } else if (this.simulatedProgress < 90) {
+                this.simulatedProgress += Math.random() * 1;
+            }
+
+            this.updateStatus('processing', this.getProgressiveStatusMessage(), Math.min(90, Math.floor(this.simulatedProgress)));
+
+            if (this.simulatedProgress >= 90) {
+                clearInterval(this.progressInterval);
+            }
+        }, 500);
+    }
+
+    stopProgressSimulation() {
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+        }
+        this.simulatedProgress = 0;
+    }
+
     async sendMessage(message) {
+        const sendButton = document.getElementById('sendButton');
+        const originalText = sendButton ? sendButton.textContent : '';
+        if (sendButton) {
+            sendButton.classList.add('sending');
+            sendButton.textContent = 'Envoi...';
+        }
+
         this.addMessage(message, true);
+        this.placeholderMessage = this.createPlaceholderMessage();
         this.showTyping();
         this.setProcessingState(true);
-        
+        this.startProgressSimulation();
+
         try {
             const formData = new FormData();
             formData.append('action', 'chat');
             formData.append('message', message);
             formData.append('workspace', this.config.WORKSPACE);
-            
+
             const response = await fetch(this.config.API_ENDPOINT, {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
-            
+
             const data = await response.json();
-            
+
             this.hideTyping();
-            
+
             if (data.error) {
+                if (this.placeholderMessage) {
+                    this.placeholderMessage.remove();
+                    this.placeholderMessage = null;
+                }
                 this.addMessage(`Erreur : ${data.error}`, false, true);
                 this.updateStatus('error', 'Erreur');
                 this.showToast('Erreur lors de la communication', 'error');
+                this.stopProgressSimulation();
+                this.setProcessingState(false);
+                if (sendButton) {
+                    sendButton.classList.remove('sending');
+                    sendButton.textContent = originalText;
+                }
             } else if (data.success && data.message) {
-                // Utiliser l'effet de streaming pour afficher la réponse
                 await this.streamMessage(data.message);
             } else {
+                if (this.placeholderMessage) {
+                    this.placeholderMessage.remove();
+                    this.placeholderMessage = null;
+                }
                 this.addMessage('Aucune réponse reçue du serveur', false, true);
                 this.updateStatus('error', 'Pas de réponse');
+                this.stopProgressSimulation();
+                this.setProcessingState(false);
+                if (sendButton) {
+                    sendButton.classList.remove('sending');
+                    sendButton.textContent = originalText;
+                }
             }
         } catch (error) {
             console.error('Erreur de communication:', error);
             this.hideTyping();
+            if (this.placeholderMessage) {
+                this.placeholderMessage.remove();
+                this.placeholderMessage = null;
+            }
             this.addMessage(`Erreur de connexion : ${error.message}`, false, true);
             this.updateStatus('error', 'Erreur connexion');
             this.showToast('Problème de connexion', 'error');
-        } finally {
+            this.stopProgressSimulation();
             this.setProcessingState(false);
+            if (sendButton) {
+                sendButton.classList.remove('sending');
+                sendButton.textContent = originalText;
+            }
         }
     }
 
     async streamMessage(content) {
-        // Créer la structure du message
-        const messageElement = this.createMessageElement('', false, false);
-        const messageContentDiv = messageElement.querySelector('.message');
+        this.stopProgressSimulation();
+        let messageElement;
+        let messageContentDiv;
+        if (this.placeholderMessage) {
+            messageElement = this.placeholderMessage;
+            messageContentDiv = messageElement.querySelector('.message');
+            messageContentDiv.innerHTML = '';
+            this.placeholderMessage = null;
+        } else {
+            messageElement = this.createMessageElement('', false, false);
+            messageContentDiv = messageElement.querySelector('.message');
+        }
 
         // Convertir le contenu en HTML sécurisé et nettoyé avant le streaming
         const html = this.generateHTML(content);
@@ -580,8 +688,8 @@ class SymplissimeAIApp {
                 fragment.appendChild(tokens[currentIndex].cloneNode(true));
                 messageContentDiv.appendChild(fragment);
                 this.scrollToBottom();
-                const progress = Math.round(((currentIndex + 1) / totalTokens) * 100);
-                this.updateStatus('processing', 'Réponse en cours', progress);
+                const progress = 90 + Math.round(((currentIndex + 1) / totalTokens) * 10);
+                this.updateStatus('processing', null, Math.min(99, progress));
                 this.streamingInterval = setTimeout(streamNextToken, 0);
                 currentIndex++;
             } else {
@@ -636,6 +744,17 @@ class SymplissimeAIApp {
         this.scrollToBottom();
 
         return wrapper;
+    }
+
+    createPlaceholderMessage() {
+        const messageElement = this.createMessageElement('', false, false);
+        const messageDiv = messageElement.querySelector('.message');
+        for (let i = 0; i < 3; i++) {
+            const skeleton = document.createElement('div');
+            skeleton.className = 'message-skeleton';
+            messageDiv.appendChild(skeleton);
+        }
+        return messageElement;
     }
 
     renderMarkdown(element, content) {
@@ -828,6 +947,13 @@ class SymplissimeAIApp {
 
         this.scrollToBottom();
         this.markLastUserMessageAsRead();
+        this.stopProgressSimulation();
+        this.setProcessingState(false);
+        const sendButton = document.getElementById('sendButton');
+        if (sendButton) {
+            sendButton.classList.remove('sending');
+            sendButton.textContent = 'Envoyer';
+        }
         this.updateStatus('done', 'Terminé', 100);
         setTimeout(() => this.updateStatus('connected', 'Connecté'), 1500);
     }
@@ -836,17 +962,24 @@ class SymplissimeAIApp {
         this.isProcessing = processing;
         const messageInput = this.getMessageInput();
         const sendButton = document.getElementById('sendButton');
-        
+
         if (messageInput) {
             messageInput.disabled = processing;
         }
-        
+
         if (sendButton) {
             sendButton.disabled = processing;
         }
-        
+
+        document.querySelectorAll('.avatar.bot').forEach(avatar => {
+            avatar.classList.toggle('processing', processing);
+        });
+
         if (processing) {
-            this.updateStatus('processing', 'Analyse en cours');
+            this.processingStartTime = Date.now();
+            this.updateStatus('processing');
+        } else {
+            this.processingStartTime = null;
         }
     }
 
@@ -1165,7 +1298,7 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
                 break;
             case 'processing':
                 statusDot.classList.add('processing');
-                statusText.textContent = message || 'Analyse en cours';
+                statusText.textContent = message || this.getProgressiveStatusMessage();
                 break;
             case 'error':
                 statusDot.classList.add('error');
