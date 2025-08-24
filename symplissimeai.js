@@ -365,6 +365,11 @@ class SymplissimeAIApp {
             chatForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
 
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            chatMessages.addEventListener('scroll', () => this.updateScrollIndicator());
+        }
+
         // Animations et ripple sur les boutons
         document.querySelectorAll('.control-btn, .send-button').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -384,6 +389,8 @@ class SymplissimeAIApp {
                 e.returnValue = '';
             }
         });
+
+        this.updateScrollIndicator();
     }
 
     // Crée un effet ripple basé sur la position du clic
@@ -1154,8 +1161,18 @@ Comment puis-je vous assister aujourd'hui dans votre support technique ?`;
         if (chatMessages) {
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                this.updateScrollIndicator();
             }, 50);
         }
+    }
+
+    updateScrollIndicator() {
+        const chatMessages = document.getElementById('chatMessages');
+        const progress = document.getElementById('scrollProgress');
+        if (!chatMessages || !progress) return;
+        const { scrollTop, scrollHeight, clientHeight } = chatMessages;
+        const percent = scrollHeight > clientHeight ? (scrollTop / (scrollHeight - clientHeight)) * 100 : 0;
+        progress.style.width = `${percent}%`;
     }
 
     markLastUserMessageAsRead() {

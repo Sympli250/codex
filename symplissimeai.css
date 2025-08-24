@@ -799,7 +799,7 @@ body {
   border-radius: 50%;
   background: var(--c-pri-light);
   box-shadow: 0 0 12px rgba(161, 212, 75, 0.6);
-  animation: pulse 2s infinite;
+  animation: pulse 2.5s cubic-bezier(0.66, 0, 0.4, 1) infinite;
 }
 
 .status-dot.processing {
@@ -830,7 +830,7 @@ body {
 
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 0.6; }
 }
 
 @keyframes spin {
@@ -862,6 +862,22 @@ body {
 }
 
 /* CHAT MESSAGES */
+.scroll-indicator {
+  height: 3px;
+  background: var(--fluent-border-color-light);
+  position: relative;
+}
+
+.scroll-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: var(--c-pri-light);
+  transition: width 0.2s ease;
+}
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -927,6 +943,11 @@ body {
   }
 }
 
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
 .avatar {
   width: 36px;
   height: 36px;
@@ -969,6 +990,7 @@ body {
   max-width: 100%;
   /* Améliore la lisibilité du texte */
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  animation: breathe 6s ease-in-out infinite;
 }
 
 .message.user {
@@ -1083,19 +1105,19 @@ body {
   height: 8px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--c-pri) 0%, var(--c-pri-light) 100%);
-  animation: typing 1.4s infinite;
+  animation: typingWave 1.4s ease-in-out infinite;
 }
 
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes typing {
-  0%, 60%, 100% { 
-    transform: translateY(0) scale(1); 
-    opacity: 0.5;
+@keyframes typingWave {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
   }
-  30% { 
-    transform: translateY(-12px) scale(1.2); 
+  30% {
+    transform: translateY(-10px);
     opacity: 1;
   }
 }
