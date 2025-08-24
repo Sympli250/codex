@@ -1209,11 +1209,22 @@ body {
 }
 
 /* Formatage des listes */
+
 .message ul.formatted-list,
 .message ol.formatted-list {
     margin: 0.8em 0;
     padding-left: 1.5em;
     line-height: 1.6;
+}
+
+.message ol.formatted-list {
+    list-style-type: decimal;
+    list-style-position: outside;
+}
+
+.message ol.formatted-list li::marker {
+    font-weight: 600;
+    color: var(--c-pri);
 }
 
 .message ul.formatted-list li,
