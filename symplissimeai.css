@@ -569,16 +569,19 @@ body {
 .symplissime-text {
   font-size: 11px;
   font-weight: 600;
+  font-variation-settings: "wght" 600;
   background: linear-gradient(90deg, var(--c-pri-light), var(--c-pri));
   -webkit-background-clip: text;
   color: transparent;
-  transition: font-weight 0.3s ease, letter-spacing 0.3s ease;
+  transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
   text-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
 .symplissime-text:hover {
   font-weight: 700;
+  font-variation-settings: "wght" 700;
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* CONTROLS PANEL */
@@ -1310,6 +1313,10 @@ body {
 .message p.formatted-paragraph {
     margin: 0 0 0.8em 0;
     line-height: 1.6;
+    font-weight: 400;
+    font-variation-settings: "wght" 400;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
 }
 
 .message p.formatted-paragraph:last-child {
@@ -1344,11 +1351,24 @@ body {
 .message ol.formatted-list li {
     margin-bottom: 0.4em;
     line-height: 1.6;
+    font-weight: 400;
+    font-variation-settings: "wght" 400;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
 }
 
 .message ul.formatted-list li:last-child,
 .message ol.formatted-list li:last-child {
     margin-bottom: 0;
+}
+
+.message p.formatted-paragraph:hover,
+.message ul.formatted-list li:hover,
+.message ol.formatted-list li:hover {
+    font-weight: 600;
+    font-variation-settings: "wght" 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Listes imbriquées */
@@ -1367,6 +1387,38 @@ body {
     margin-bottom: 0.5em;
     line-height: 1.3;
     font-weight: 600;
+    font-variation-settings: "wght" 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
+}
+
+.message h1,
+.message h2,
+.message h3 {
+    background: linear-gradient(90deg, var(--c-pri), var(--c-pri-light));
+    -webkit-background-clip: text;
+    color: transparent;
+    font-variation-settings: "wght" 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    transition: font-variation-settings 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
+}
+
+.message h1:hover,
+.message h2:hover,
+.message h3:hover {
+    font-weight: 700;
+    font-variation-settings: "wght" 700;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.message h4:hover,
+.message h5:hover,
+.message h6:hover {
+    font-weight: 700;
+    font-variation-settings: "wght" 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .message h1:first-child,
