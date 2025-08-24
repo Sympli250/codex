@@ -935,17 +935,109 @@ class SymplissimeAIApp {
     launchMatrix() {
         const container = document.createElement('div');
         container.className = 'matrix-container';
-        for (let i = 0; i < 100; i++) {
-            const span = document.createElement('span');
-            span.textContent = Math.random() > 0.5 ? '0' : '1';
-            span.style.left = Math.random() * 100 + '%';
-            span.style.animationDelay = Math.random() * 5 + 's';
-            container.appendChild(span);
+        
+        // Version optimisée avec Canvas pour de meilleures performances
+        const canvas = document.createElement('canvas');
+        canvas.className = 'matrix-canvas';
+        container.appendChild(canvas);
+        document.body.appendChild(container);
+        
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Configuration Matrix
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}01";
+        const matrixArray = matrix.split("");
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        
+        // Tableau pour stocker la position Y de chaque colonne
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * -100;
         }
+        
+        // Fonction de dessin
+        let animationId;
+        const draw = () => {
+            // Effet de traînée avec fond semi-transparent
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            // Dessiner les caractères
+            for(let i = 0; i < drops.length; i++) {
+                // Caractère aléatoire
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                
+                // Position x et y
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                // Réinitialiser la colonne qui atteint le bas
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                // Faire tomber le caractère
+                drops[i]++;
+            }
+            
+            animationId = requestAnimationFrame(draw);
+        };
+        
+        // Démarrer l'animation
+        draw();
+        
+        // Nettoyer après 8 secondes
+        setTimeout(() => {
+            cancelAnimationFrame(animationId);
+            container.remove();
+        }, 8000);
+        
+        // Gérer le redimensionnement
+        const handleResize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        window.addEventListener('resize', handleResize);
+        
+        // Nettoyer l'event listener à la fin
+        setTimeout(() => {
+            window.removeEventListener('resize', handleResize);
+        }, 8000);
+    }
+
+    launchMatrixFallback() {
+        const container = document.createElement('div');
+        container.className = 'matrix-container fallback';
+        
+        // Version allégée avec moins d'éléments DOM
+        const columns = Math.floor(window.innerWidth / 20);
+        const chars = '01';
+        
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = (i * 20) + 'px';
+            column.style.animationDuration = (3 + Math.random() * 4) + 's';
+            column.style.animationDelay = Math.random() * 2 + 's';
+            
+            // Générer une colonne de caractères
+            let text = '';
+            for (let j = 0; j < 30; j++) {
+                text += chars[Math.floor(Math.random() * chars.length)] + '\n';
+            }
+            column.textContent = text;
+            
+            container.appendChild(column);
+        }
+        
         document.body.appendChild(container);
         setTimeout(() => container.remove(), 8000);
     }
-
     cameleonMode() {
         const container = document.getElementById('chatContainer');
         if (!container) return;
