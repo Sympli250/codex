@@ -13,6 +13,57 @@ function nocache_url($url) {
     return $url . $separator . 'v=' . time();
 }
 
+// Handle feedback saving
+if (isset($_POST['action']) && $_POST['action'] === 'feedback') {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+
+    $question = $_POST['question'] ?? '';
+    $answer = $_POST['answer'] ?? '';
+    $entry = [
+        'question' => $question,
+        'answer' => $answer,
+        'date' => date('Y-m-d H:i:s')
+    ];
+
+    $file = __DIR__ . '/validated_responses.json';
+    $fp = fopen($file, 'c+');
+    if ($fp === false) {
+        echo json_encode(['success' => false, 'error' => 'Unable to open file']);
+        exit;
+    }
+    // Acquire an exclusive lock
+    if (flock($fp, LOCK_EX)) {
+        // Read existing data
+        $fileSize = filesize($file);
+        if ($fileSize > 0) {
+            rewind($fp);
+            $contents = fread($fp, $fileSize);
+            $data = json_decode($contents, true);
+            if (!is_array($data)) {
+                $data = [];
+            }
+        } else {
+            $data = [];
+        }
+        $data[] = $entry;
+        // Truncate and write new data
+        rewind($fp);
+        ftruncate($fp, 0);
+        fwrite($fp, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        fflush($fp);
+        flock($fp, LOCK_UN);
+    } else {
+        fclose($fp);
+        echo json_encode(['success' => false, 'error' => 'Unable to lock file']);
+        exit;
+    }
+    fclose($fp);
+
+    echo json_encode(['success' => true]);
+    exit;
+}
+
 // Handle chat requests
 if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     header('Content-Type: application/json');
