@@ -167,6 +167,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/string-strip-html/dist/string-strip-html.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-clean/dist/html-clean.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
     <script src="symplissimeai.js"></script>
 </body>
