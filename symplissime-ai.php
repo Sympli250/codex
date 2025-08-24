@@ -27,16 +27,38 @@ if (isset($_POST['action']) && $_POST['action'] === 'feedback') {
     ];
 
     $file = __DIR__ . '/validated_responses.json';
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([]));
+    $fp = fopen($file, 'c+');
+    if ($fp === false) {
+        echo json_encode(['success' => false, 'error' => 'Unable to open file']);
+        exit;
     }
-
-    $data = json_decode(file_get_contents($file), true);
-    if (!is_array($data)) {
-        $data = [];
+    // Acquire an exclusive lock
+    if (flock($fp, LOCK_EX)) {
+        // Read existing data
+        $fileSize = filesize($file);
+        if ($fileSize > 0) {
+            rewind($fp);
+            $contents = fread($fp, $fileSize);
+            $data = json_decode($contents, true);
+            if (!is_array($data)) {
+                $data = [];
+            }
+        } else {
+            $data = [];
+        }
+        $data[] = $entry;
+        // Truncate and write new data
+        rewind($fp);
+        ftruncate($fp, 0);
+        fwrite($fp, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        fflush($fp);
+        flock($fp, LOCK_UN);
+    } else {
+        fclose($fp);
+        echo json_encode(['success' => false, 'error' => 'Unable to lock file']);
+        exit;
     }
-    $data[] = $entry;
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    fclose($fp);
 
     echo json_encode(['success' => true]);
     exit;
