@@ -804,10 +804,14 @@ class SymplissimeAIApp {
 
     finishStreaming(messageElement, content) {
         const messageDiv = messageElement.querySelector('.message');
-        // Appliquer la coloration syntaxique après insertion complète
-        messageDiv.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-        });
+        // Appliquer la coloration syntaxique après insertion complète si hljs est disponible
+        if (window.hljs && typeof window.hljs.highlightElement === 'function') {
+            messageDiv.querySelectorAll('pre code').forEach(block => {
+                window.hljs.highlightElement(block);
+            });
+        } else {
+            console.warn('Highlight.js est absent, coloration ignorée.');
+        }
 
         // Enregistrer dans l'historique
         this.messageHistory.push({ content, isUser: false, isError: false, timestamp: new Date() });
