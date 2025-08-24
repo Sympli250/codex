@@ -183,24 +183,24 @@
 }
 
 [data-theme="rainbow-theme"] {
-  --c-pri: #ff0080;
-  --c-pri-light: #ff8c00;
-  --c-pri-dark: #8b00ff;
+  --c-pri: #FF3B30;
+  --c-pri-light: #FF9500;
+  --c-pri-dark: #AF52DE;
   --c-bg: #fff;
-  --c-bg-hover: #fff0ff;
-  --c-border: #ffd9ff;
-  --c-shadow: 0 4px 30px #ff00ff22, 0 1.5px 6px #ff00ff18;
-  --c-table-odd: #fff0f5;
-  --c-table-even: #ffe6ff;
+  --c-bg-hover: #fff5f5;
+  --c-border: #ffd2e1;
+  --c-shadow: 0 4px 30px #ff3b3022, 0 1.5px 6px #ff950018;
+  --c-table-odd: #fff5f7;
+  --c-table-even: #fff0f5;
   --fluent-primary: var(--c-pri);
   --fluent-text-color: var(--c-pri);
   --fluent-border-color-light: var(--c-border);
   --fluent-border-color-accent: var(--c-pri-light);
-  --fluent-background-light: #fff0f5;
+  --fluent-background-light: #fff5f5;
   --fluent-hover-background: var(--c-bg-hover);
-  --fluent-active-background: #ffd6ff;
-  --fluent-shadow-container: 0 2px 8px rgba(255, 0, 255, 0.14);
-  --chat-bg: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  --fluent-active-background: #ffe5e5;
+  --fluent-shadow-container: 0 2px 8px rgba(255, 59, 48, 0.14);
+  --chat-bg: linear-gradient(90deg, #FF3B30, #FF9500, #FFCC00, #34C759, #007AFF, #AF52DE);
 }
 
 * {
@@ -361,7 +361,7 @@ body {
 }
 
 .theme-preview.rainbow::before {
-  background: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet);
+  background: linear-gradient(135deg, #FF3B30, #FF9500, #FFCC00, #34C759, #007AFF, #AF52DE);
 }
 
 .theme-option:hover .theme-preview::before {
@@ -418,7 +418,7 @@ body {
 
 /* Matrix */
 .matrix-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -439,7 +439,7 @@ body {
 
 @keyframes matrix-fall {
   from { transform: translateY(-100%); }
-  to { transform: translateY(100vh); }
+  to { transform: translateY(100%); }
 }
 
 /* Cameleon mode */
@@ -777,6 +777,7 @@ body {
   flex-direction: column;
   gap: 20px;
   background: var(--fluent-background-light);
+  position: relative;
 }
 
 .chat-messages::-webkit-scrollbar {
