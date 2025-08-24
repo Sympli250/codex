@@ -512,8 +512,8 @@ class SymplissimeAIApp {
         const messageElement = this.createMessageElement('', false, false);
         const messageContentDiv = messageElement.querySelector('.message');
 
-        // Convertir le contenu en HTML sécurisé avant le streaming
-        const html = DOMPurify.sanitize(marked.parse(content));
+        // Convertir le contenu en HTML sécurisé et nettoyé avant le streaming
+        const html = this.generateHTML(content);
 
         // Variables pour le streaming par blocs
         const totalChars = html.length;
@@ -585,11 +585,29 @@ class SymplissimeAIApp {
 
     renderMarkdown(element, content) {
         if (!element) return;
-        const html = DOMPurify.sanitize(marked.parse(content));
+        const html = this.generateHTML(content);
         element.innerHTML = html;
         element.querySelectorAll('pre code').forEach(block => {
             hljs.highlightElement(block);
         });
+    }
+
+    generateHTML(content) {
+        let processed = content;
+        if (window.stringStripHtml && typeof window.stringStripHtml.stripHtml === 'function') {
+            processed = window.stringStripHtml.stripHtml(processed, {
+                trimOnlySpaces: true
+            }).result;
+        }
+        let html = marked.parse(processed);
+        html = DOMPurify.sanitize(html);
+        if (typeof htmlClean === 'function') {
+            html = htmlClean(html);
+        }
+        html = html
+            .replace(/\n{2,}/g, '\n')
+            .replace(/[\t ]{2,}/g, ' ');
+        return html.trim();
     }
 
     finishStreaming(messageElement, content) {
