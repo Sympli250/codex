@@ -601,17 +601,28 @@ class SymplissimeAIApp {
         }
         processed = processed
             .replace(/\r\n/g, '\n')
-            .replace(/\n{2,}/g, '\n');
+            .replace(/\n{3,}/g, '\n\n');
+
         let html = marked.parse(processed);
-        html = DOMPurify.sanitize(html);
+
+        if (window.DOMPurify) {
+            html = DOMPurify.sanitize(html);
+        }
+
         if (typeof htmlClean === 'function') {
             html = htmlClean(html);
         }
-        html = html
-            .replace(/<p>\s*<\/p>/g, '')
-            .replace(/(<br\s*\/?>\s*){2,}/g, '<br>')
-            .replace(/[\t ]{2,}/g, ' ');
-        return html.trim();
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+
+        wrapper.querySelectorAll('p').forEach(p => {
+            if (!p.textContent.trim()) p.remove();
+        });
+
+        wrapper.innerHTML = wrapper.innerHTML.replace(/(<br\s*\/?>\s*){2,}/g, '<br>');
+
+        return wrapper.innerHTML.trim();
     }
 
     finishStreaming(messageElement, content) {
