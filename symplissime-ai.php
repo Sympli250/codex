@@ -130,7 +130,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'chat') {
                     <span>Symplissime</span>
                 </div>
             </div>
-            
+
+            <div class="scroll-indicator"><div class="scroll-progress" id="scrollProgress"></div></div>
+
             <div class="chat-messages" id="chatMessages"></div>
             
             <div class="chat-input-container">
