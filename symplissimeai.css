@@ -897,6 +897,12 @@ body {
   text-align: center;
 }
 
+.message p,
+.message ul,
+.message ol {
+  margin: 0.25em 0;
+}
+
 /* MESSAGE ACTIONS */
 .message-actions {
   display: flex;
