@@ -1367,31 +1367,6 @@ body {
   }
 }
 
-/* LOADING STATE */
-.loading {
-  position: relative;
-}
-
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
-  margin: auto;
-  border: 2px solid var(--fluent-primary);
-  border-radius: 50%;
-  animation: none;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* === CORRECTIONS DE FORMATAGE === */
 
 /* Formatage optimisé des paragraphes */

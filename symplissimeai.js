@@ -839,11 +839,6 @@ class SymplissimeAIApp {
         
         if (sendButton) {
             sendButton.disabled = processing;
-            if (processing) {
-                sendButton.classList.add('loading');
-            } else {
-                sendButton.classList.remove('loading');
-            }
         }
         
         if (processing) {
