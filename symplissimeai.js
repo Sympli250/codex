@@ -97,6 +97,7 @@ class SymplissimeAIApp {
         this.focusInput();
         this.createThemeSelector();
         this.createFontSelector();
+        this.initParallax();
     }
 
     loadSavedPreferences() {
@@ -356,6 +357,15 @@ class SymplissimeAIApp {
 
     toggleFont() {
         this.toggleFontDropdown();
+    }
+
+    initParallax() {
+        const header = document.querySelector('.chat-header');
+        if (!header) return;
+        window.addEventListener('scroll', () => {
+            const offset = window.scrollY * 0.1;
+            header.style.transform = `translateZ(${offset}px)`;
+        });
     }
 
     bindEvents() {
