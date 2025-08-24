@@ -48,6 +48,11 @@ class SymplissimeAIApp {
                 name: 'Midnight Dark',
                 icon: '🌙',
                 attribute: 'midnight-dark'
+            },
+            'rainbow': {
+                name: 'Rainbow',
+                icon: '🌈',
+                attribute: 'rainbow-theme'
             }
         };
 
@@ -73,6 +78,8 @@ class SymplissimeAIApp {
                 css: "'Montserrat', sans-serif"
             }
         };
+
+        this.easterEggs = ['/confettis','/darkflip','/fortune','/matrix','/cameleon','/eastereggs'];
         
         this.init();
     }
@@ -402,7 +409,7 @@ class SymplissimeAIApp {
 
         const messageInput = this.getMessageInput();
         const message = messageInput.value.trim();
-        
+
         if (!message) {
             this.showToast('Veuillez saisir un message', 'warning');
             return;
@@ -413,9 +420,45 @@ class SymplissimeAIApp {
             return;
         }
 
+        if (message.startsWith('/')) {
+            if (this.handleCommand(message)) {
+                messageInput.value = '';
+                return;
+            }
+        }
+
         messageInput.value = '';
         this.addPromptSuggestion(message);
         await this.sendMessage(message);
+    }
+
+    handleCommand(cmd) {
+        const command = cmd.slice(1).toLowerCase();
+        switch (command) {
+            case 'confettis':
+                this.launchConfetti();
+                this.showToast('🎉 Party time!');
+                return true;
+            case 'darkflip':
+                this.darkFlip();
+                return true;
+            case 'fortune':
+                this.showFortune();
+                return true;
+            case 'matrix':
+                this.launchMatrix();
+                this.showToast('💻 Welcome to the Matrix');
+                return true;
+            case 'cameleon':
+                this.cameleonMode();
+                this.showToast('🦎 Le caméléon vous observe…');
+                return true;
+            case 'eastereggs':
+                this.addMessage(`Easter Eggs disponibles: ${this.easterEggs.join(', ')}`, false);
+                return true;
+            default:
+                return false;
+        }
     }
 
     async sendMessage(message) {
@@ -644,12 +687,92 @@ class SymplissimeAIApp {
         emailBtn.className = 'action-btn';
         emailBtn.innerHTML = '📧 Email';
         emailBtn.onclick = () => this.sendByEmail(content);
-        
+
+        const feedback = document.createElement('div');
+        feedback.className = 'message-feedback';
+        const up = document.createElement('span');
+        up.className = 'thumb thumb-up';
+        up.textContent = '👍';
+        up.onclick = () => this.showToast('Merci pour votre retour!');
+        const down = document.createElement('span');
+        down.className = 'thumb thumb-down';
+        down.textContent = '👎';
+        down.onclick = () => this.showToast('Merci pour votre retour!');
+        feedback.appendChild(up);
+        feedback.appendChild(down);
+
         actions.appendChild(copyBtn);
         actions.appendChild(saveBtn);
         actions.appendChild(emailBtn);
-        
+        actions.appendChild(feedback);
+
         return actions;
+    }
+
+    launchConfetti() {
+        const container = document.createElement('div');
+        container.className = 'confetti-container';
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360},100%,50%)`;
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            container.appendChild(confetti);
+        }
+        document.body.appendChild(container);
+        setTimeout(() => container.remove(), 5000);
+    }
+
+    darkFlip() {
+        const original = this.currentTheme;
+        const target = original === 'dark' ? 'symplissime' : 'dark';
+        this.applyTheme(target);
+        this.showToast(target === 'dark' ? '🌙 Mode secret activé' : '☀️ Retour à la normale');
+        setTimeout(() => {
+            this.applyTheme(original);
+            this.showToast(original === 'dark' ? '🌙 Mode secret activé' : '☀️ Retour à la normale');
+        }, 5000);
+    }
+
+    showFortune() {
+        const fortunes = [
+            'Une sauvegarde réussie illumine ta journée.',
+            'Chaque bug est une chance de briller.',
+            'Un redémarrage bien placé vaut mille correctifs.',
+            'La patience est la meilleure optimisation.',
+            'Les logs conduisent à la sagesse.'
+        ];
+        const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+        this.addMessage(`(Easter Egg) ${fortune}`, false);
+    }
+
+    launchMatrix() {
+        const container = document.createElement('div');
+        container.className = 'matrix-container';
+        for (let i = 0; i < 100; i++) {
+            const span = document.createElement('span');
+            span.textContent = Math.random() > 0.5 ? '0' : '1';
+            span.style.left = Math.random() * 100 + '%';
+            span.style.animationDelay = Math.random() * 5 + 's';
+            container.appendChild(span);
+        }
+        document.body.appendChild(container);
+        setTimeout(() => container.remove(), 8000);
+    }
+
+    cameleonMode() {
+        const container = document.getElementById('chatContainer');
+        if (!container) return;
+        container.classList.add('cameleon-mode');
+        const mascot = document.createElement('div');
+        mascot.className = 'cameleon-mascot';
+        mascot.textContent = '🦎';
+        container.appendChild(mascot);
+        setTimeout(() => {
+            container.classList.remove('cameleon-mode');
+            mascot.remove();
+        }, 10000);
     }
 
     showTyping() {
