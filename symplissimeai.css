@@ -1047,6 +1047,13 @@ body {
   margin: 0.25em 0;
 }
 
+/* Images responsives dans les messages */
+.message img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* MESSAGE ACTIONS */
 .message-actions {
   display: flex;
@@ -1296,7 +1303,7 @@ body {
   }
   
   .chat-container {
-    height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
     border-radius: 8px;
   }
   
@@ -1309,7 +1316,7 @@ body {
   }
   
   .message-content {
-    max-width: 85%;
+    max-width: 100%;
   }
   
   .send-button span {
@@ -1358,13 +1365,16 @@ body {
 .loading::after {
   content: '';
   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 16px;
   height: 16px;
   margin: auto;
-  border: 2px solid transparent;
-  border-top-color: var(--fluent-primary);
+  border: 2px solid var(--fluent-primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: none;
 }
 
 @keyframes spin {

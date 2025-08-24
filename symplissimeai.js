@@ -759,6 +759,8 @@ class SymplissimeAIApp {
         temp.querySelectorAll('p').forEach(p => {
             if (!p.textContent.trim() && !p.querySelector('img')) {
                 p.remove();
+            } else {
+                p.classList.add('formatted-paragraph');
             }
         });
 
