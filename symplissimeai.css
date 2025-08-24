@@ -416,32 +416,62 @@ body {
   to { transform: translateY(110vh) rotate(720deg); }
 }
 
-/* Matrix */
+/* Matrix Effect - Version optimisée */
 .matrix-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-  background: rgba(0,0,0,0.9);
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    animation: matrixFadeIn 0.5s ease-in;
 }
 
-.matrix-container span {
-  position: absolute;
-  top: -20px;
-  color: #0f0;
-  font-family: monospace;
-  animation: matrix-fall 5s linear infinite;
+@keyframes matrixFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
-@keyframes matrix-fall {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(100%); }
+.matrix-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
+/* Style alternatif si Canvas n'est pas supporté */
+.matrix-container.fallback {
+    background: black;
+    font-family: monospace;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    color: #0F0;
+    font-size: 14px;
+    line-height: 14px;
+    text-shadow: 0 0 5px #0F0;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    animation: matrixFall linear infinite;
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU acceleration */
+}
+
+@keyframes matrixFall {
+    to {
+        transform: translateY(calc(100vh + 100%));
+    }
+}
 /* Cameleon mode */
 #chatContainer.cameleon-mode {
   background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
