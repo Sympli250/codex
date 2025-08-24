@@ -882,22 +882,30 @@ class SymplissimeAIApp {
         return content;
     }
 
-    markImportantHeadings(root) {
+    applyGradientToHeadings(root) {
         if (!root) return;
-        root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+        const headings = root.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        headings.forEach(h => {
             const level = parseInt(h.tagName.replace('H', ''), 10);
-            h.classList.add('formatted-title', `title-level-${level}`);
+            h.classList.add('gradient-title', 'formatted-title', `title-level-${level}`);
         });
+
+        // Vérification post-traitement : tous les titres doivent avoir la classe gradient-title
+        const missing = Array.from(headings).filter(h => !h.classList.contains('gradient-title'));
+        if (missing.length) {
+            console.warn('Titres sans classe gradient détectés, correction appliquée.');
+            missing.forEach(h => {
+                const level = parseInt(h.tagName.replace('H', ''), 10);
+                h.classList.add('gradient-title', 'formatted-title', `title-level-${level}`);
+            });
+        }
     }
 
     validateFormatting(root) {
         // Vérifie et applique les classes CSS obligatoires
         if (!root) return;
 
-        root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
-            const level = parseInt(h.tagName.replace('H', ''), 10);
-            h.classList.add('formatted-title', `title-level-${level}`);
-        });
+        this.applyGradientToHeadings(root);
 
         root.querySelectorAll('p').forEach(p => {
             if (!p.textContent.trim() && !p.querySelector('img')) {
@@ -956,8 +964,8 @@ class SymplissimeAIApp {
             }
         });
 
-        // Identifier et marquer les titres importants
-        this.markImportantHeadings(temp);
+        // Appliquer systématiquement les classes de titres
+        this.applyGradientToHeadings(temp);
 
         // Améliorer les blocs de code
         temp.querySelectorAll('pre').forEach(pre => {
