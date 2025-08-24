@@ -208,6 +208,7 @@ class SymplissimeAIApp {
     toggleThemeDropdown() {
         const dropdown = document.getElementById('themeDropdown');
         if (dropdown) {
+            this.hideFontDropdown();
             dropdown.classList.toggle('show');
         }
     }
@@ -244,6 +245,8 @@ class SymplissimeAIApp {
             
             // Afficher un toast avec transition fluide
             this.showToast(`Thème ${this.themes[themeKey].name} appliqué`, 'success');
+
+            this.hideThemeDropdown();
         }
     }
 
@@ -319,6 +322,7 @@ class SymplissimeAIApp {
     toggleFontDropdown() {
         const dropdown = document.getElementById('fontDropdown');
         if (dropdown) {
+            this.hideThemeDropdown();
             dropdown.classList.toggle('show');
         }
     }
@@ -345,6 +349,8 @@ class SymplissimeAIApp {
 
             localStorage.setItem('symplissime_font', fontKey);
             this.showToast(`Police ${this.fonts[fontKey].name} appliquée`, 'success');
+
+            this.hideFontDropdown();
         }
     }
 
