@@ -13,6 +13,35 @@ function nocache_url($url) {
     return $url . $separator . 'v=' . time();
 }
 
+// Handle feedback saving
+if (isset($_POST['action']) && $_POST['action'] === 'feedback') {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+
+    $question = $_POST['question'] ?? '';
+    $answer = $_POST['answer'] ?? '';
+    $entry = [
+        'question' => $question,
+        'answer' => $answer,
+        'date' => date('Y-m-d H:i:s')
+    ];
+
+    $file = __DIR__ . '/validated_responses.json';
+    if (!file_exists($file)) {
+        file_put_contents($file, json_encode([]));
+    }
+
+    $data = json_decode(file_get_contents($file), true);
+    if (!is_array($data)) {
+        $data = [];
+    }
+    $data[] = $entry;
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    echo json_encode(['success' => true]);
+    exit;
+}
+
 // Handle chat requests
 if (isset($_POST['action']) && $_POST['action'] === 'chat') {
     header('Content-Type: application/json');

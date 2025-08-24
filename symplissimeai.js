@@ -904,6 +904,15 @@ class SymplissimeAIApp {
         up.onclick = () => {
             this.showToast('Merci pour votre retour!');
             this.launchConfetti();
+            const question = this.messageHistory.slice().reverse().find(m => m.isUser)?.content || '';
+            const formData = new FormData();
+            formData.append('action', 'feedback');
+            formData.append('question', question);
+            formData.append('answer', content);
+            fetch(this.config.API_ENDPOINT, {
+                method: 'POST',
+                body: formData
+            });
             setTimeout(() => {
                 this.addMessage(
                     "Nous serions ravis d'avoir votre avis sur [Trustpilot](https://fr.trustpilot.com/review/symplissime.fr)",
