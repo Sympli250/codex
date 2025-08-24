@@ -1625,3 +1625,8 @@ h6.gradient-title {
     margin-bottom: 0;
 }
 
+/* Stamp utilisé pour marquer les éléments déjà normalisés */
+.symplissime-stamp {
+    /* aucune règle visuelle, sert uniquement de marqueur */
+}
+
