@@ -1,5 +1,8 @@
 <?php
 session_start();
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Configuration Symplissime AI
 $BASE_URL = 'http://storage.symplissime.fr:3002';
