@@ -605,6 +605,7 @@ class SymplissimeAIApp {
             html = htmlClean(html);
         }
         html = html
+            .replace(/(<br\s*\/?>\s*){2,}/g, '<br>')
             .replace(/\n{2,}/g, '\n')
             .replace(/[\t ]{2,}/g, ' ');
         return html.trim();
