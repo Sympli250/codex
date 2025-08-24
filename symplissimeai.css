@@ -1479,7 +1479,10 @@ body {
 
 .message h1,
 .message h2,
-.message h3 {
+.message h3,
+.message h4,
+.message h5,
+.message h6 {
     background: linear-gradient(90deg, var(--c-pri), var(--c-pri-light));
     background-clip: text;
     -webkit-background-clip: text;
