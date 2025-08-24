@@ -696,9 +696,10 @@ class SymplissimeAIApp {
         up.onclick = () => {
             this.showToast('Merci pour votre retour!');
             setTimeout(() => {
-                if (confirm('Souhaitez-vous laisser un avis positif sur Trustpilot ?')) {
-                    window.open('https://fr.trustpilot.com/', '_blank');
-                }
+                this.addMessage(
+                    "Nous serions ravis d'avoir votre avis sur [Trustpilot](https://fr.trustpilot.com/)",
+                    false
+                );
             }, 500);
         };
         const down = document.createElement('span');
@@ -755,8 +756,6 @@ class SymplissimeAIApp {
     }
 
     launchMatrix() {
-        const chatMessages = document.getElementById('chatMessages');
-        if (!chatMessages) return;
         const container = document.createElement('div');
         container.className = 'matrix-container';
         for (let i = 0; i < 100; i++) {
@@ -766,7 +765,7 @@ class SymplissimeAIApp {
             span.style.animationDelay = Math.random() * 5 + 's';
             container.appendChild(span);
         }
-        chatMessages.appendChild(container);
+        document.body.appendChild(container);
         setTimeout(() => container.remove(), 8000);
     }
 
