@@ -1,0 +1,13 @@
+{
+  "name": "codex",
+  "version": "1.0.0",
+  "description": "Ce projet fournit une interface JavaScript pour discuter avec Symplissime AI et téléverser des documents.",
+  "main": "symplissimeai.js",
+  "scripts": {
+    "test": "node test_streaming.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
